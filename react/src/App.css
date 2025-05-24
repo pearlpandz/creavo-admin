@@ -1,0 +1,312 @@
+.konvajs-content {
+    border: 1px solid #e4e4e4;
+    background: #fff;
+    box-shadow: 0 3px 3px 5px #e4e4e4;
+}
+
+.image-list {
+    display: flex;
+    padding: 0;
+    list-style: none;
+    margin: 0;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+
+/* admin part - canvas editor */
+.modal-form-container input,
+.modal-form-container select {
+    padding: 5px;
+    margin-bottom: 10px;
+    width: 100%;
+    height: 35px;
+    display: block;
+}
+
+.modal-form-container label {
+    line-height: 35px;
+    display: block;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.button-container button {
+    padding: 5px;
+    height: 35px;
+}
+
+.toolbar {
+    display: flex;
+    gap: 5px;
+    flex-direction: column;
+    background: #f7f7f7;
+    margin-bottom: 10px;
+    padding: 5px;
+    border-radius: 5px;
+    box-shadow: 0 2px 1px 0px rgb(162 151 151 / 25%);
+    width: 50px;
+    border-right: 1px solid #e5e5e5;
+}
+
+.toolbar button {
+    width: 100%;
+    height: 35px;
+    background: transparent;
+    border: none;
+}
+
+.toolbar button svg {
+    width: 1.5em;
+    height: 1.5em;
+}
+
+.layout {
+    display: flex;
+    height: calc(100vh - 40px);
+    width: 100%;
+}
+
+.navigation {
+    height: 40px;
+    background: #f7f7f7;
+    box-shadow: 0 2px 3px 2px #e4e4e4;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.layout .canvas-container {
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    background: #e4e4e4;
+    overflow: auto;
+}
+
+.layout .form-container {
+    width: 300px;
+    padding: 0;
+}
+
+.navigation .nav-action {
+    margin-right: 20px;
+    background: #3295ed;
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-size: 12px;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    text-transform: capitalize;
+}
+
+.navigation .go-back-action {
+    margin-right: 20px;
+    background: transparent;
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-size: 12px;
+    color: #000;
+    font-weight: bold;
+    border: none;
+    text-transform: capitalize;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.go-back-action svg {
+    font-size: 16px;
+}
+
+.navigation .navigation h4 {
+    font-weight: normal;
+    font-size: 18px;
+}
+
+.flex {
+    display: flex;
+}
+
+.appearance {
+    display: flex;
+    gap: 5px;
+    border-bottom: 1px solid #e4e4e4;
+    border-top: 1px solid #e4e4e4
+}
+
+.text-alignments {
+    gap: 10px;
+    padding: 15px 10px;
+    border-left: 1px solid #e4e4e4;
+}
+
+.element-positions {
+    gap: 10px;
+    padding: 15px 10px;
+}
+
+.icon-btn svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.placement,
+.style-properties {
+    padding: 10px 15px 20px;
+    border-bottom: 1px solid #e4e4e4;
+}
+
+.placement h6,
+.style-properties h6 {
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    color: #444;
+}
+
+.element-placement {
+    display: flex;
+    gap: 15px;
+}
+
+.element-size,
+.element-axis {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 70px;
+}
+
+.element-size label,
+.element-axis label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+}
+
+.element-size label input[type="number"],
+.element-axis label input[type="number"] {
+    border: none;
+    border-bottom: 1px solid #e4e4e4;
+    padding: 5px;
+    width: 100%;
+}
+
+.style-properties label {
+    display: flex;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.style-properties label span {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    width: 75px;
+}
+
+.style-properties label input {
+    flex: 1;
+}
+
+.style-properties label input[type="number"] {
+    border: none;
+    border-bottom: 1px solid #e4e4e4;
+    padding: 5px;
+    width: 50px;
+    flex: none;
+}
+
+.style-properties label input[type="color"] {
+    border: none;
+    width: 40px;
+    height: 25px;
+    flex: none;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    outline: none;
+}
+
+.style-properties label input[type="range"] {
+    height: 3px;
+}
+
+.style-properties.attributes {
+    border-bottom: none;
+}
+
+.style-properties.attributes label {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.style-properties.attributes label input {
+    border: none;
+    border-bottom: 1px solid #e4e4e4;
+    padding: 5px;
+    margin-top: 5px;
+    width: 100%;
+}
+
+.icon-btn.active svg {
+    fill: #ffffff;
+}
+
+.icon-btn.active {
+    border: 2px solid #3295ed;
+    border-radius: 2px;
+    background: #3295ed;
+}
+
+.template-properties {
+    padding: 20px 15px 0px 15px;
+
+    h6 {
+        font-size: 11px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+        color: #444;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 15px;
+
+        span {
+            width: 100%;
+            display: inline-block;
+            margin-bottom: 5px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        input {
+            width: 100%;
+            display: inline-block;
+            border: none;
+            border-bottom: 1px solid #e4e4e4;
+            padding: 7px 10px;
+        }
+
+        select {
+            width: 100%;
+            display: inline-block;
+            border-color: #e4e4e4;
+            padding: 7px 10px;
+        }
+    }
+}

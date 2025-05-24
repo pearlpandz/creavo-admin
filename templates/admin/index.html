@@ -1,0 +1,24 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+  <style>
+    #content {
+      width: auto !important;
+      margin: 0 !important;
+    }
+    #content-related {
+      display: none;
+    }
+  </style>
+  {% with block.super|safe as super_content %}
+    {% autoescape off %}
+      {{ super_content|cut:"<div id=\"content-related\">"|cut:"<div class=\"module\" id=\"recent-actions-module\">"|cut:"</div>" }}
+    {% endautoescape %}
+  {% endwith %}
+  <div class="recent-actions module">
+    <h2>CUSTOM ACTIONS</h2>
+    <ul class="actionlist">
+      <li><a href="{% url 'admin:custom_recent_actions' %}">View All Recent Actions</a></li>
+    </ul>
+  </div>
+{% endblock %}

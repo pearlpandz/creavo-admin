@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  django:
+    image: ghcr.io/pearlpandz/creavo/django
+    build: ./backend/services/django
+    command: /app/entrypoint.sh
+    volumes:
+      - ./:/app
+    ports:
+      - "8000:8000"

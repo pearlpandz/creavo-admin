@@ -1,0 +1,100 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  .cutom-button {
+    border: 0;
+    padding: 7px 20px;
+    background: #264b5d;
+    color: #fff;
+    border-radius: 4px;
+    font-weight: bold;
+  }
+  thead th {
+    padding: 10px;
+  }
+  td, th {
+    padding: 10px;
+  }
+</style>
+<!-- <h1>{{ title }}</h1> -->
+
+<form method="get" style="margin-bottom: 1em;">
+  <input type="text" name="q" placeholder="Search..." value="{{ query }}">
+  <input type="number" name="days" value="{{ days }}" min="1">
+  <select name="action_flag">
+    <option value="">All Actions</option>
+    <option value="1" {% if action_flag == '1' %}selected{% endif %}>Add</option>
+    <option value="2" {% if action_flag == '2' %}selected{% endif %}>Change</option>
+    <option value="3" {% if action_flag == '3' %}selected{% endif %}>Delete</option>
+  </select>
+  <button type="submit" class="cutom-button">Filter</button>
+</form>
+
+<form method="get" action="">
+  <input type="hidden" name="q" value="{{ query }}">
+  <input type="hidden" name="days" value="{{ days }}">
+  <input type="hidden" name="action_flag" value="{{ action_flag }}">
+  <input type="hidden" name="ordering" value="{{ ordering }}">
+  <input type="hidden" name="export" value="csv">
+  <button type="submit" class="cutom-button">Export to CSV</button>
+</form>
+
+<table class="adminlog" style="width: 100%; margin-top: 1em;">
+  <thead>
+    <tr>
+      <th>
+        <a href="?ordering={% if ordering == 'user__username' %}-user__username{% else %}user__username{% endif %}&q={{ query }}&days={{ days }}&action_flag={{ action_flag }}">
+          User
+        </a>
+      </th>
+      <th>Action</th>
+      <th>
+        <a href="?ordering={% if ordering == 'content_type__model' %}-content_type__model{% else %}content_type__model{% endif %}&q={{ query }}&days={{ days }}&action_flag={{ action_flag }}">
+          Model
+        </a>
+      </th>
+      <th>Object</th>
+      <th>Message</th>
+      <th>
+        <a href="?ordering={% if ordering == 'action_time' %}-action_time{% else %}action_time{% endif %}&q={{ query }}&days={{ days }}&action_flag={{ action_flag }}">
+          Time
+        </a>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for log in logs %}
+    <tr>
+      <td>{{ log.user }}</td>
+      <td>{{ log.get_action_flag_display }}</td>
+      <td>{{ log.content_type }}</td>
+      <td>{{ log.object_repr }}</td>
+      <td>{{ log.get_change_message }}</td>
+      <td>{{ log.action_time }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if is_paginated %}
+  <div class="pagination">
+    <span class="step-links">
+      {% if page_obj.has_previous %}
+        <a href="?q={{ query }}&days={{ days }}&action_flag={{ action_flag }}&ordering={{ ordering }}&page=1">&laquo; first</a>
+        <a href="?q={{ query }}&days={{ days }}&action_flag={{ action_flag }}&ordering={{ ordering }}&page={{ page_obj.previous_page_number }}">previous</a>
+      {% endif %}
+
+      <span class="current">
+        Page {{ page_obj.number }} of {{ paginator.num_pages }}
+      </span>
+
+      {% if page_obj.has_next %}
+        <a href="?q={{ query }}&days={{ days }}&action_flag={{ action_flag }}&ordering={{ ordering }}&page={{ page_obj.next_page_number }}">next</a>
+        <a href="?q={{ query }}&days={{ days }}&action_flag={{ action_flag }}&ordering={{ ordering }}&page={{ paginator.num_pages }}">last &raquo;</a>
+      {% endif %}
+    </span>
+  </div>
+{% endif %}
+{% endblock %}
