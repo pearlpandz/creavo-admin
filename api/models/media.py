@@ -10,7 +10,7 @@ class Media(models.Model):
     image = models.URLField(max_length=200, null=True)
     media_type = models.CharField(max_length=50,default=None, choices=[('image', 'Image (png, jpg, webp, gif)'), ('video', 'Video')])
     title = models.CharField(max_length=100)
-    short_description = models.TextField(null=True, blank=True)
+    short_description = models.TextField(null=True, blank=True, default=None)
     categories = models.ManyToManyField(Category, related_name='media', blank=True)
     subcategories = models.ManyToManyField(SubCategory, related_name='media', blank=True)
 

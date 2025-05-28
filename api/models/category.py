@@ -2,7 +2,7 @@ from django.db import models
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True, default=None)
     order = models.IntegerField(default=1000)
 
     REQUIRED_FIELDS = ['name']
