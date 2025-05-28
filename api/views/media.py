@@ -26,19 +26,21 @@ class MediaViewSet(viewsets.ModelViewSet):
 
         for category in categories:
             cat_data = {
-                "category": category.name,                
+                "category": category.name,
+                "description": category.description,
                 "subcategories": []
             }
 
             # Check if subcategories exist for the category
-            media_items = Media.objects.filter(categories=category).distinct()[:10]  # limit to 10 items
+            media_items = Media.objects.filter(categories=category).distinct()[:15]  # limit to 15 items
             # If no subcategories, include media at the root level of the category
             if not SubCategory.objects.filter(category=category).exists():
                 cat_data["media"] = [
                     {
                         "id": item.id,
                         "title": item.title,
-                        "image": item.image
+                        "image": item.image,
+                        "short_description": item.short_description if item.short_description else None
                     }
                     for item in media_items
                 ]
@@ -49,15 +51,17 @@ class MediaViewSet(viewsets.ModelViewSet):
                 media_items = Media.objects.filter(
                     categories=category,
                     subcategories=subcategory
-                ).distinct()[:10]  # limit to 10 items
+                ).distinct()[:15]  # limit to 15 items
 
                 cat_data["subcategories"].append({
                     "name": subcategory.name,
+                    "description": subcategory.description,
                     "media": [
                         {
                             "id": item.id,
                             "title": item.title,
-                            "image": item.image
+                            "image": item.image,
+                            "short_description": item.short_description if item.short_description else None
 
                         }
                         for item in media_items 
