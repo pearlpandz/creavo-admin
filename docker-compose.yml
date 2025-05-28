@@ -6,6 +6,6 @@ services:
     build: ./
     command: /app/entrypoint.sh
     volumes:
-      - ./:/app
+      - ./creavo_admin:/app/creavo_admin
     ports:
       - "8000:8000"
