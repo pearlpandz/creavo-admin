@@ -40,7 +40,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
   const [selectedId, setSelectedId] = useState(null);
   const [templateName, setTemplateName] = useState("");
   const stageRef = useRef();
-  const [templateCategory, setTemplateCategory] = useState("regular");
+  const [templateCategory, setTemplateCategory] = useState();
   const { mutate: patchMutate } = usePatchTemplate();
   const { mutate: createMutate } = useCreateTemplate();
   const [show, setShow] = useState(false);
@@ -692,7 +692,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
                       onChange={handleChange}
                     />
                   );
-                } else if (el.type === "polygon") {
+                } else if (["polygon", "triangle"].includes(el.type)) {
                   return (
                     <CanvasPolygon
                       key={el.id}

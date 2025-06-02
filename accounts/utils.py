@@ -29,8 +29,8 @@ def authenticate_user(request, user_model, user_type):
         },
     })
 
-    response.set_cookie("refresh_token", str(refresh), httponly=True)
-    response.set_cookie("access_token", str(refresh.access_token), httponly=True)
+    response.set_cookie("refresh_token", str(refresh), httponly=True, secure=True, samesite="None")
+    response.set_cookie("access_token", str(refresh.access_token), httponly=True, secure=True, samesite="None")
 
     return response
 

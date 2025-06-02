@@ -1,10 +1,11 @@
 import { CiText, CiTextAlignCenter, CiTextAlignJustify, CiTextAlignLeft, CiTextAlignRight, CiImageOn, CiUndo, CiRedo } from "react-icons/ci";
 import { CgShapeCircle, CgShapeSquare } from "react-icons/cg";
 import { RiBringForward, RiBringToFront, RiSendBackward, RiSendToBack } from "react-icons/ri";
+import { useTemplateCategory } from "../hook/useTemplate";
 
 // Form Component for Element Properties
 const CanvasElementForm = ({ element, onChange, templateCategory, handleCategoryChange, templateName, setTemplateName }) => {
-
+  const { data: templateCategories } = useTemplateCategory();
   const updateValue = (field, value) => {
     onChange({ ...element, [field]: value });
   };
@@ -58,10 +59,12 @@ const CanvasElementForm = ({ element, onChange, templateCategory, handleCategory
 
         <label>
           <span>cateogry</span>
-          <select name="category" id="category" value={templateCategory} onChange={handleCategoryChange}>
-            <option value="regular">Regular</option>
-            <option value="product">Product</option>
-            <option value="political">Political</option>
+          <select name="category" id="category" value={templateCategory ?? templateCategories?.[0]?.name} onChange={handleCategoryChange}>
+            {
+              templateCategories?.map((category) => (
+                <option value={category.name} key={category.id}>{category.name}</option>
+              ))
+            }
           </select>
         </label>
       </div>

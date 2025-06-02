@@ -24,6 +24,27 @@ const fetchTemplates = async () => {
     return data
 }
 
+const fetchTemplateCategories = async () => {
+    const response = await fetch(`${SETTINGS.admin_endpoint}/frames/frametypes/`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    if (!response.ok) {
+        throw new Error('Network response was not ok')
+    }
+    const data = await response.json()
+    return data
+}
+
+export const useTemplateCategory = () => {
+    return useQuery({
+        queryKey: ['template-category'],
+        queryFn: fetchTemplateCategories
+    })
+}
+
 export const useTemplate = () => {
     const { data: templates, isLoading, refetch } = useQuery({
         queryKey: ['templates'],

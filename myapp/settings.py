@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api.apps.ApiConfig',
     'accounts.apps.AccountsConfig',
+    'frames.apps.FramesConfig',
     'corsheaders',
     'drf_spectacular',
 ]
