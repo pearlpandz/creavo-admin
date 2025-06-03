@@ -31,7 +31,7 @@ import CanvasPolygon from "./CanvasPolygon";
 import CanvasWedge from "./CanvasWedge";
 import { v4 as uuidv4 } from "uuid";
 import MultiPointLine from "./CanvasMultiPointLine";
-
+import placeholder from '/assets/placeholder.webp'
 
 // Canvas Editor
 const CanvasEditor = ({ template, mode = "edit" }) => {
@@ -272,7 +272,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
       {
         id: `image-${Date.now()}`,
         type: "image",
-        src: "https://frame-service.creavo.in/uploads/placeholder-image.jpg",
+        src: placeholder,
         x: 100,
         y: 100,
         width: 150,
@@ -396,7 +396,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
       y: 100,
       width: 200,
       height: 200,
-      src: "https://frame-service.creavo.in/uploads/placeholder-image.jpg",
+      src: placeholder,
       radius: 0,
       opacity: 100,
       type: "clip-image",
