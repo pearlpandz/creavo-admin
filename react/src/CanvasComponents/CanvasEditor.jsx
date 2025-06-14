@@ -31,7 +31,8 @@ import CanvasPolygon from "./CanvasPolygon";
 import CanvasWedge from "./CanvasWedge";
 import { v4 as uuidv4 } from "uuid";
 import MultiPointLine from "./CanvasMultiPointLine";
-import placeholder from '/assets/placeholder.webp'
+
+const placeholder = 'https://frame-service.creavo.in/uploads/placeholder-image.jpg'
 
 // Canvas Editor
 const CanvasEditor = ({ template, mode = "edit" }) => {
