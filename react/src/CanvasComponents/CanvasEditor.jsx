@@ -1,5 +1,5 @@
 import { Stage, Layer, Transformer } from "react-konva";
-import { useState, useRef, useEffect, useMemo, useCallback, use } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useUndoRedo } from "../hook/useUndoRedo";
 import CanvasImage from "./CanvasImage";
 import CanvasText from "./CanvasText";
@@ -31,8 +31,7 @@ import CanvasPolygon from "./CanvasPolygon";
 import CanvasWedge from "./CanvasWedge";
 import { v4 as uuidv4 } from "uuid";
 import MultiPointLine from "./CanvasMultiPointLine";
-import { toast } from "react-toastify";
-
+import placeholder from '/assets/placeholder.webp'
 
 // Canvas Editor
 const CanvasEditor = ({ template, mode = "edit" }) => {
@@ -43,7 +42,6 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
   const [templateCategory, setTemplateCategory] = useState();
   const { mutate: patchMutate } = usePatchTemplate();
   const { mutate: createMutate } = useCreateTemplate();
-  const [show, setShow] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [showMenu, setShowMenu] = useState(false);
 
@@ -72,6 +70,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
     } else {
       setElements([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [template]);
 
   // Create and cleanup context menu
@@ -273,7 +272,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
       {
         id: `image-${Date.now()}`,
         type: "image",
-        src: "https://frame-service.creavo.in/uploads/placeholder-image.jpg",
+        src: placeholder,
         x: 100,
         y: 100,
         width: 150,
@@ -397,7 +396,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
       y: 100,
       width: 200,
       height: 200,
-      src: "https://frame-service.creavo.in/uploads/placeholder-image.jpg",
+      src: placeholder,
       radius: 0,
       opacity: 100,
       type: "clip-image",
@@ -410,7 +409,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
 
   const saveTemplate = async () => {
     const dataURL = stageRef.current.toDataURL({
-      pixelRatio: 0.5, // double resolution
+      pixelRatio: 0.4, // 40% resolution of actual canvas size
     });
     const file = dataURLtoFile(dataURL, `${templateName}.png`);
     const formdata = new FormData();
@@ -428,7 +427,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
 
   const updateTemplate = async () => {
     const dataURL = stageRef.current.toDataURL({
-      pixelRatio: 1, // double resolution
+      pixelRatio: 0.4, // 40% resolution of actual canvas size
     });
     const file = dataURLtoFile(dataURL, `${templateName}.png`);
     const formdata = new FormData();

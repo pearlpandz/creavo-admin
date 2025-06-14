@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 from .views.order import OrderViewSet
 from .views.master_distributor import MasterDistributorViewSet
 from .views.distributor import DistributorViewSet
-from .views.user import UserViewSet
+from .views.user import UserSupportersViewSet, UserPoliticalViewSet, UserProductDetailsViewSet, UserPartyViewSet, UserViewSet, UserCompanyDetailsViewSet
 from .views.subscription import SubscriptionViewSet
 from .views.license import LicenseViewSet, licenses_by_distributor, licenses_by_master_distributor
 from .views.license_generator import LicenseGeneratorAPIView
@@ -17,6 +17,11 @@ router.register(r'subscriptions', SubscriptionViewSet, basename='subscription')
 router.register(r'orders', OrderViewSet, basename='order') 
 router.register(r'licenses', LicenseViewSet, basename='license')
 router.register(r'users', UserViewSet, basename='user')
+router.register(r'companydetails', UserCompanyDetailsViewSet, basename='companydetails')
+router.register(r'product', UserProductDetailsViewSet, basename='product')
+router.register(r'political', UserPoliticalViewSet, basename='political')
+router.register(r'supporter', UserSupportersViewSet, basename='supporter')
+router.register(r'party', UserPartyViewSet, basename='party')
 
 urlpatterns = [
     path('generate-licenses/', LicenseGeneratorAPIView.as_view(), name='generate-licenses'),
