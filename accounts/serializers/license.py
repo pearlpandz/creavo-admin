@@ -8,7 +8,7 @@ from ..models.user import User
 class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'price', 'duration_days', 'description']
 
 class DistributorSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()

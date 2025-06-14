@@ -2,13 +2,40 @@ from django.contrib import messages
 from django.urls import path
 from django.contrib import admin
 from django.shortcuts import get_object_or_404, redirect
-from .models import User, Subscription, License, Distributor, MasterDistributor, Order, OrderSubscription
+from .models import User, Subscription, License, Distributor, MasterDistributor, Order, OrderSubscription, CompanyDetails, Product, Political, Supporters, Party
+import nested_admin
+
+class ProductInline(nested_admin.NestedTabularInline):
+    model = Product
+    extra = 0
+
+class CompanyDetailsInline(nested_admin.NestedStackedInline):
+    model = CompanyDetails
+    extra = 0
+    exclude = ['image']  # hides the field from the form
+
+class SupportersInline(nested_admin.NestedTabularInline):
+    model = Supporters
+    extra = 0
+    exclude = ['image']  # hides the field from the form
+
+class PartyInline(nested_admin.NestedTabularInline):
+    model = Party
+    extra = 0
+    exclude = ['image']  # hides the field from the form
+
+class PoliticalInline(nested_admin.NestedStackedInline):
+    model = Political
+    extra = 0
+    exclude = ['image']  # hides the field from the form
+    inlines = [PartyInline, SupportersInline]
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(nested_admin.NestedModelAdmin):
     list_display = ('first_name', 'last_name', 'email', 'mobile_number', 'is_verified', 'date_joined')
     search_fields = ('email', 'mobile_number', 'first_name', 'last_name')
     list_filter = ('is_verified', 'date_joined')
+    inlines = [CompanyDetailsInline, ProductInline, PoliticalInline]
 
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):

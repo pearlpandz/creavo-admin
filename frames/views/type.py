@@ -6,6 +6,7 @@ from drf_spectacular.utils import extend_schema # type: ignore
 from rest_framework.decorators import action
 import requests
 from rest_framework.response import Response
+from django.conf import settings
 
 @extend_schema(tags=['frametype'])
 class FrameTypeViewSet(viewsets.ModelViewSet):
@@ -20,7 +21,8 @@ class FrameTypeViewSet(viewsets.ModelViewSet):
 
         # Fetch counts from external API
         try:
-            resp = requests.get("https://frame-service.creavo.in/api/frame/category/count", timeout=5)
+            resp = requests.get(f'{settings.FRAME_SERVER_URL}/api/frame/category/count', timeout=5)
+            print(resp.json())
             counts = resp.json() if resp.status_code == 200 else {}
         except Exception:
             counts = {}
