@@ -12,7 +12,7 @@ class EventAdminConfig(admin.ModelAdmin):
     list_filter=['name']
     list_per_page = 15
     sortable_by=['name']
-    ordering = ['name']
+    ordering = ['order']
     exclude = ['image'] 
 
     def image_tag(self, obj):

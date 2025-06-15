@@ -5,6 +5,7 @@ class FrameType(models.Model):
     media = models.FileField(upload_to='', default=None)
     image = models.URLField(max_length=200, null=True)
     description = models.TextField(null=True, blank=True, default=None)
+    order = models.IntegerField(default=1)
 
     REQUIRED_FIELDS = ['name']
 

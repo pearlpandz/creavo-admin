@@ -16,7 +16,7 @@ class FrameTypeViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], url_path='list')
     def category_list(self, request):
-        frametypes = self.get_queryset()
+        frametypes = self.get_queryset().order_by('order')
         serializer = self.get_serializer(frametypes, many=True)
 
         # Fetch counts from external API

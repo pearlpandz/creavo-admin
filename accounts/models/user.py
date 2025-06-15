@@ -18,6 +18,7 @@ class User(models.Model):
     created_by_master_distributor = models.ForeignKey(MasterDistributor, on_delete=models.SET_NULL, null=True, blank=True, related_name="users_created_by_master_distributor")
     license = models.CharField(max_length=100, blank=True)
     purchased_date = models.DateField(null=True, blank=True)
+    last_login = models.DateTimeField(blank=True, null=True, default=None)
 
     def save(self, *args, **kwargs):
         if self.password and not self.password.startswith('pbkdf2_'):
