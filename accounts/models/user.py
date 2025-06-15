@@ -10,6 +10,8 @@ class User(models.Model):
     email = models.EmailField(unique=True)
     mobile_number = models.CharField(max_length=15, unique=True)
     password = models.CharField(max_length=128)
+    website = models.CharField(max_length=100, blank=True)
+    address = models.TextField(blank=True, null=True, default=None)
     date_joined = models.DateTimeField(auto_now_add=True)
     is_verified = models.BooleanField(default=False)
     overall_downloads = models.PositiveIntegerField(default=0) # overall downloads
