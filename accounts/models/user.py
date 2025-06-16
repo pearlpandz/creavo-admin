@@ -18,6 +18,7 @@ class User(models.Model):
     created_by_master_distributor = models.ForeignKey(MasterDistributor, on_delete=models.SET_NULL, null=True, blank=True, related_name="users_created_by_master_distributor")
     license = models.CharField(max_length=100, blank=True)
     purchased_date = models.DateField(null=True, blank=True)
+    last_login = models.DateTimeField(blank=True, null=True, default=None)
 
     def save(self, *args, **kwargs):
         if self.password and not self.password.startswith('pbkdf2_'):
@@ -42,6 +43,8 @@ class CompanyDetails(models.Model):
     email = models.EmailField(max_length=50, null=True, default=None, blank=True)
     primary_contact = models.CharField(max_length=15, null=True, default=None, blank=True)
     secondary_contact = models.CharField(max_length=15, null=True, default=None, blank=True)
+    website = models.CharField(max_length=100, blank=True)
+    address = models.TextField(blank=True, null=True, default=None)
     description = models.CharField(max_length=100, blank=True)
     user = models.OneToOneField('User', on_delete=models.CASCADE, related_name='company_details', null=True, blank=True)  # Added
 
