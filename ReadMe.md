@@ -8,6 +8,9 @@ python
 pip freeze > requirements.txt
 pip install -r requirements.txt
 
+docker
+------
+docker run -d --name postgres -e POSTGRES_USER=user -e POSTGRES_PASSWORD=pass -e POSTGRES_DB=creavo -p 5432:5432 -v pgdata:/var/lib/postgresql/data postgres:14
 
 django
 ------
