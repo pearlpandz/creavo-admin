@@ -25,5 +25,8 @@ python manage.py migrate api
 python manage.py makemigrations accounts
 python manage.py migrate accounts
 
+python manage.py makemigrations frames
+python manage.py migrate frames
+
 echo "Starting Gunicorn..."
 exec gunicorn myapp.wsgi:application --bind 0.0.0.0:8000
