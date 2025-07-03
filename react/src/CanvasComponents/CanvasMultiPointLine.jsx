@@ -70,6 +70,8 @@ export default function MultiPointLine({
         onDragEnd={handleDragEnd}
         onTransformEnd={handleTransformEnd}
         fill={bgColor}
+        onClick={(e) => { if (e.evt.button === 0) rest.onSelect(e.evt.shiftKey || e.evt.ctrlKey); }}
+        onTap={(e) => { if (e.evt.button === 0) rest.onSelect(e.evt.shiftKey || e.evt.ctrlKey); }}
         {...rest}
       />
       {mappedPoints.map((point, index) => {

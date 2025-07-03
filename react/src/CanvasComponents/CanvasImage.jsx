@@ -51,8 +51,8 @@ const CanvasImage = ({ element, isSelected, onSelect, onChange, isEditable = tru
         y={element.y}
         width={element.width}
         height={element.height}
-        onClick={isEditable ? onSelect : null}
-        onTap={isEditable ? onSelect : null}
+        onClick={isEditable ? (e) => { if (e.evt.button === 0) onSelect(e.evt.shiftKey || e.evt.ctrlKey); } : null}
+        onTap={isEditable ? (e) => { if (e.evt.button === 0) onSelect(e.evt.shiftKey || e.evt.ctrlKey); } : null}
         draggable={isEditable}
         onDragMove={isEditable ? handleDragMove : null}
         onTransformEnd={isEditable ? handleTransformEnd : null}

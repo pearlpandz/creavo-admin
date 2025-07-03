@@ -92,9 +92,9 @@ const CanvasText = ({ element, isSelected, onSelect, onChange, stageRef, isEdita
           align={element?.align || "center"} // should be parameterized
           wrap="word"
           draggable={isEditable}
-          onClick={isEditable ? onSelect : null}
+          onClick={isEditable ? (e) => { if (e.evt.button === 0) onSelect(e.evt.shiftKey || e.evt.ctrlKey); } : null}
           onDblClick={isEditable ? handleDblClick : null}
-          onTap={isEditable ? handleDblClick : null} // Mobile support
+          onTap={isEditable ? (e) => { if (e.evt.button === 0) onSelect(e.evt.shiftKey || e.evt.ctrlKey); } : null} // Mobile support
           onTransformEnd={isEditable ? handleTransformEnd : null}
           onDragEnd={isEditable ? handleDragEnd : null}
         />

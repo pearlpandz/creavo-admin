@@ -8,22 +8,13 @@ import CanvasRectangle from "./CanvasRectangle";
 import CanvasCircle from "./CanvasCircle";
 import CanvasElementForm from "./CanvasElementForm";
 import CanvasClippedImage from "./CanvasClippedImage";
-import {
-  dataURLtoFile,
-  getNumericVal,
-  getRelativePointerPosition,
-} from "../utils";
+import { dataURLtoFile, getNumericVal, getRelativePointerPosition } from "../utils";
 import { useCreateTemplate, usePatchTemplate } from "../hook/useTemplate";
 import { MdOutlineFormatShapes } from "react-icons/md";
-import {
-  CgShapeCircle,
-  CgShapeHexagon,
-  CgShapeSquare,
-  CgShapeTriangle,
-} from "react-icons/cg";
+import { CgShapeCircle, CgShapeHexagon, CgShapeSquare, CgShapeTriangle } from "react-icons/cg";
 import { BiCircleHalf } from "react-icons/bi";
 import { TbShape } from "react-icons/tb";
-import { FaUndo, FaRedo } from "react-icons/fa";
+import { FaUndo, FaRedo, FaLayerGroup } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 import { FaImage } from "react-icons/fa6";
 import Navigation from "../components/Navigation";
@@ -31,13 +22,15 @@ import CanvasPolygon from "./CanvasPolygon";
 import CanvasWedge from "./CanvasWedge";
 import { v4 as uuidv4 } from "uuid";
 import MultiPointLine from "./CanvasMultiPointLine";
+import { arrayMove } from '@dnd-kit/sortable';
+import Layers from "./Layers";
 
-const placeholder = 'https://frame-service.creavo.in/uploads/placeholder-image.jpg'
+const placeholder = 'https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f'
 
 // Canvas Editor
 const CanvasEditor = ({ template, mode = "edit" }) => {
   const [elements, setElements, undo, redo] = useUndoRedo([]);
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
   const [templateName, setTemplateName] = useState("");
   const stageRef = useRef();
   const [templateCategory, setTemplateCategory] = useState();
@@ -45,6 +38,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
   const { mutate: createMutate } = useCreateTemplate();
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [showMenu, setShowMenu] = useState(false);
+  const [showLayers, setShowLayers] = useState(false);
 
   const [drawAction, setDrawAction] = useState(null);
   const [currentlyDrawnShape, setCurrentlyDrawnShape] = useState({});
@@ -87,7 +81,16 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
     };
   }, []);
 
-  const handleSelect = (id) => setSelectedId(id);
+  const handleSelect = (id, multiSelect = false) => {
+    if (multiSelect) {
+      const newSelectedIds = selectedIds.includes(id)
+        ? selectedIds.filter(selectedId => selectedId !== id)
+        : [...selectedIds, id];
+      setSelectedIds(newSelectedIds);
+    } else {
+      setSelectedIds([id]);
+    }
+  };
 
   const handleChange = (newAttrs) => {
     setElements(
@@ -98,7 +101,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
   };
 
   const deSelect = useCallback(() => {
-    setSelectedId(null);
+    setSelectedIds([]);
     transformerRef?.current?.nodes([]);
   }, []);
 
@@ -160,7 +163,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
       return;
     }
 
-    isPaintRef.current = true;
+
   };
 
   const handleStageMouseUp = () => {
@@ -169,7 +172,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
     numMultiPointRef.current = 0;
     setDrawAction(null);
 
-    if (currentlyDrawnShape) setElements([...elements, currentlyDrawnShape]);
+    if (currentlyDrawnShape.type) setElements([...elements, currentlyDrawnShape]);
     setCurrentlyDrawnShape({});
   };
 
@@ -207,18 +210,18 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
   };
 
   const bringToFront = () => {
-    if (selectedId) {
-      const updatedElements = elements.filter((el) => el.id !== selectedId);
-      const selectedElement = elements.find((el) => el.id === selectedId);
+    if (selectedIds.length === 1) {
+      const updatedElements = elements.filter((el) => el.id !== selectedIds[0]);
+      const selectedElement = elements.find((el) => el.id === selectedIds[0]);
       updatedElements.push(selectedElement);
       setElements(updatedElements);
     }
   };
 
   const sendToBack = () => {
-    if (selectedId) {
-      const updatedElements = elements.filter((el) => el.id !== selectedId);
-      const selectedElement = elements.find((el) => el.id === selectedId);
+    if (selectedIds.length === 1) {
+      const updatedElements = elements.filter((el) => el.id !== selectedIds[0]);
+      const selectedElement = elements.find((el) => el.id === selectedIds[0]);
       updatedElements.unshift(selectedElement);
       setElements(updatedElements);
     }
@@ -264,7 +267,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
       slug: "{{text-box}}",
     };
     setElements([...elements, newTextBoxElement]);
-    setSelectedId(id); // Select the new element
+    setSelectedIds([id]); // Select the new element
   };
 
   const addImageElement = () => {
@@ -301,7 +304,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
       slug: "{{rect}}",
     };
     setElements([...elements, newRectangleElement]);
-    setSelectedId(id);
+    setSelectedIds([id]);
   };
 
   const addPolygon = (type = "polygon", sides = 6) => {
@@ -322,7 +325,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
       slug: `{{${type}}}`,
     };
     setElements([...elements, newPolygonElement]);
-    setSelectedId(id);
+    setSelectedIds([id]);
   };
 
   const addWedge = () => {
@@ -343,7 +346,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
       slug: `{{wedge}}`,
     };
     setElements([...elements, newWedgeElement]);
-    setSelectedId(id);
+    setSelectedIds([id]);
   };
 
   const addTriangle = () => {
@@ -365,7 +368,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
       slug: "{{triangle}}",
     };
     setElements([...elements, newTriangleElement]);
-    setSelectedId(id);
+    setSelectedIds([id]);
   };
 
   const addCircle = () => {
@@ -385,7 +388,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
       slug: "{{circle}}",
     };
     setElements([...elements, newCircleElement]);
-    setSelectedId(id);
+    setSelectedIds([id]);
   };
 
   const addClipImage = () => {
@@ -405,7 +408,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
       bgColor: "#444",
     };
     setElements([...elements, newClipImageElement]);
-    setSelectedId(id);
+    setSelectedIds([id]);
   };
 
   const saveTemplate = async () => {
@@ -450,7 +453,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
     reader.onload = () => {
       setElements(
         elements.map((el) =>
-          el.id === selectedId ? { ...el, src: reader.result } : el
+          el.id === selectedIds[0] ? { ...el, src: reader.result } : el
         )
       );
     };
@@ -463,7 +466,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
 
   const onShapeClick = (e) => {
     const node = e.currentTarget;
-    handleSelect(node.attrs.id);
+    handleSelect(node.attrs.id, e.evt.shiftKey || e.evt.ctrlKey);
     transformerRef.current?.nodes([node]);
   };
 
@@ -489,29 +492,72 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
     });
 
     setShowMenu(true);
-    // setSelectedId(e.target.id());
     e.cancelBubble = true;
   };
 
   // Handle delete element by context menu
   const handleDelete = () => {
-    const newCircles = elements.filter((circle) => circle.id !== selectedId);
-    setElements(newCircles);
+    const newElements = elements.filter((el) => !selectedIds.includes(el.id));
+    setElements(newElements);
     setShowMenu(false);
   };
 
   // Handle duplicate to create a new element as similar to the selected element
   const handleDuplicate = () => {
-    const index = elements?.findIndex((a) => a.id === selectedId);
-    const isExist = index !== -1;
-    if (!isExist) return;
-    let selectedElement = { ...elements[index] };
-    selectedElement["id"] = uuidv4(); // generate new id
-    selectedElement["x"] = selectedElement["x"] + 10;
-    selectedElement["y"] = selectedElement["y"] + 10;
-    selectedElement["slug"] = "";
-    setElements([...elements, selectedElement]);
-    setSelectedId(selectedElement.id);
+    const selectedElement = elements.find((el) => el.id === selectedIds[0]);
+    if (!selectedElement) return;
+
+    let newElement = { ...selectedElement };
+    newElement.id = uuidv4(); // generate new id
+    newElement.x = newElement.x + 10;
+    newElement.y = newElement.y + 10;
+    newElement.slug = "";
+    setElements([...elements, newElement]);
+    setSelectedIds([newElement.id]);
+    setShowMenu(false);
+  };
+
+  const handleReorder = (oldIndex, newIndex) => {
+    setElements(arrayMove(elements, oldIndex, newIndex));
+  };
+
+  const handleClip = () => {
+    if (selectedIds.length !== 2) return;
+
+    const selectedElements = elements.filter(el => selectedIds.includes(el.id));
+    const imageElement = selectedElements.find(el => el.type === 'clip-image');
+    const shapeElement = selectedElements.find(el => el.type !== 'clip-image');
+
+    if (!imageElement || !shapeElement) return;
+
+    // Calculate shape position/size relative to image
+    const relX = shapeElement.x - imageElement.x;
+    const relY = shapeElement.y - imageElement.y;
+    const relWidth = shapeElement.width;
+    const relHeight = shapeElement.height;
+
+    // Only copy relevant properties for masking
+    const clip = {
+      type: shapeElement.type,
+      x: relX,
+      y: relY,
+      width: relWidth,
+      height: relHeight,
+      ...(shapeElement.sides && { sides: shapeElement.sides }),
+      ...(shapeElement.angle && { angle: shapeElement.angle }),
+      ...(shapeElement.rotation && { rotation: shapeElement.rotation }),
+    };
+
+    const newImageElement = {
+      ...imageElement,
+      clip,
+    };
+
+    const newElements = elements.filter(el => el.id !== shapeElement.id);
+    const finalElements = newElements.map(el => el.id === imageElement.id ? newImageElement : el);
+
+    setElements(finalElements);
+    setSelectedIds([imageElement.id]);
     setShowMenu(false);
   };
 
@@ -601,6 +647,15 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
           <Tooltip id="add-image" />
 
           <button
+            data-tooltip-id="layers"
+            data-tooltip-content="Layers"
+            onClick={() => setShowLayers(!showLayers)}
+          >
+            <FaLayerGroup />
+          </button>
+          <Tooltip id="layers" />
+
+          <button
             data-tooltip-id="undo"
             data-tooltip-content="Undo"
             onClick={undo}
@@ -618,6 +673,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
           </button>
           <Tooltip id="redo" />
         </div>
+        {showLayers && <Layers elements={elements} onSelect={(id, multi) => handleSelect(id, multi)} selectedIds={selectedIds} onDelete={handleDelete} onReorder={handleReorder} />}
 
         <div className="canvas-container">
           <Stage
@@ -637,8 +693,8 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
                     <CanvasImage
                       key={el.id}
                       element={el}
-                      isSelected={el.id === selectedId}
-                      onSelect={() => handleSelect(el.id)}
+                      isSelected={selectedIds.includes(el.id)}
+                      onSelect={(multi) => handleSelect(el.id, multi)}
                       onChange={handleChange}
                     />
                   );
@@ -647,8 +703,8 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
                     <CanvasText
                       key={el.id}
                       element={el}
-                      isSelected={el.id === selectedId}
-                      onSelect={() => handleSelect(el.id)}
+                      isSelected={selectedIds.includes(el.id)}
+                      onSelect={(multi) => handleSelect(el.id, multi)}
                       onChange={handleChange}
                     />
                   );
@@ -657,8 +713,8 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
                     <CanvasRectangleWithText
                       key={el.id}
                       element={el}
-                      isSelected={el.id === selectedId}
-                      onSelect={() => handleSelect(el.id)}
+                      isSelected={selectedIds.includes(el.id)}
+                      onSelect={(multi) => handleSelect(el.id, multi)}
                       onChange={handleChange}
                     />
                   );
@@ -667,8 +723,8 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
                     <CanvasRectangle
                       key={el.id}
                       element={el}
-                      isSelected={el.id === selectedId}
-                      onSelect={() => handleSelect(el.id)}
+                      isSelected={selectedIds.includes(el.id)}
+                      onSelect={(multi) => handleSelect(el.id, multi)}
                       onChange={handleChange}
                     />
                   );
@@ -677,8 +733,8 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
                     <CanvasCircle
                       key={el.id}
                       element={el}
-                      isSelected={el.id === selectedId}
-                      onSelect={() => handleSelect(el.id)}
+                      isSelected={selectedIds.includes(el.id)}
+                      onSelect={(multi) => handleSelect(el.id, multi)}
                       onChange={handleChange}
                     />
                   );
@@ -687,8 +743,8 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
                     <CanvasClippedImage
                       key={el.id}
                       element={el}
-                      isSelected={el.id === selectedId}
-                      onSelect={() => handleSelect(el.id)}
+                      isSelected={selectedIds.includes(el.id)}
+                      onSelect={(multi) => handleSelect(el.id, multi)}
                       onChange={handleChange}
                     />
                   );
@@ -697,8 +753,8 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
                     <CanvasPolygon
                       key={el.id}
                       element={el}
-                      isSelected={el.id === selectedId}
-                      onSelect={() => handleSelect(el.id)}
+                      isSelected={selectedIds.includes(el.id)}
+                      onSelect={(multi) => handleSelect(el.id, multi)}
                       onChange={handleChange}
                     />
                   );
@@ -707,8 +763,8 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
                     <CanvasPolygon
                       key={el.id}
                       element={el}
-                      isSelected={el.id === selectedId}
-                      onSelect={() => handleSelect(el.id)}
+                      isSelected={selectedIds.includes(el.id)}
+                      onSelect={(multi) => handleSelect(el.id, multi)}
                       onChange={handleChange}
                     />
                   );
@@ -717,8 +773,8 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
                     <CanvasWedge
                       key={el.id}
                       element={el}
-                      isSelected={el.id === selectedId}
-                      onSelect={() => handleSelect(el.id)}
+                      isSelected={selectedIds.includes(el.id)}
+                      onSelect={(multi) => handleSelect(el.id, multi)}
                       onChange={handleChange}
                     />
                   );
@@ -731,13 +787,13 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
                         closed={el?.id !== currentlyDrawnShape?.id}
                         activatePoints={
                           el?.id === currentlyDrawnShape?.id ||
-                          el?.id === selectedId
+                          selectedIds.includes(el.id)
                         }
-                        isSelected={el?.id === selectedId}
+                        isSelected={selectedIds.includes(el.id)}
                         onPointDrag={(newPoints) => {
                           setElements(
                             elements.map((drawing) => {
-                              if (drawing.id === selectedId) {
+                              if (selectedIds.includes(drawing.id)) {
                                 return { ...drawing, points: newPoints };
                               } else return drawing;
                             })
@@ -759,7 +815,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
 
         <div className="form-container">
           <CanvasElementForm
-            element={elements?.find((el) => el.id === selectedId)}
+            element={elements?.find((el) => el.id === selectedIds[0])}
             onChange={handleChange}
             templateCategory={templateCategory}
             handleCategoryChange={handleCategoryChange}
@@ -776,7 +832,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
             position: "absolute",
             top: menuPosition.y,
             left: menuPosition.x,
-            width: "120px",
+            width: "150px",
             backgroundColor: "white",
             boxShadow: "0 0 5px grey",
             borderRadius: "3px",
@@ -784,6 +840,23 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
           }}
           onClick={(e) => e.stopPropagation()}
         >
+          {selectedIds.length === 2 && (
+            <button
+              style={{
+                width: "100%",
+                backgroundColor: "white",
+                border: "none",
+                margin: 0,
+                padding: "10px",
+                cursor: "pointer",
+              }}
+              onMouseOver={(e) => (e.target.style.backgroundColor = "lightgray")}
+              onMouseOut={(e) => (e.target.style.backgroundColor = "white")}
+              onClick={handleClip}
+            >
+              Create Clipping Mask
+            </button>
+          )}
           <button
             style={{
               width: "100%",

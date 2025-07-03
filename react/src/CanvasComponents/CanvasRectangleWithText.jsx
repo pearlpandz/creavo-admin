@@ -30,8 +30,8 @@ const CanvasRectangleWithText = ({ element, isSelected, onSelect, onChange, isEd
       x={element.x}
       y={element.y}
       draggable={isEditable}
-      onClick={isEditable ? onSelect : null}
-      onTap={isEditable ? onSelect : null}
+      onClick={isEditable ? (e) => { if (e.evt.button === 0) onSelect(e.evt.shiftKey || e.evt.ctrlKey); } : null}
+      onTap={isEditable ? (e) => { if (e.evt.button === 0) onSelect(e.evt.shiftKey || e.evt.ctrlKey); } : null}
       onDragEnd={isEditable ? handleDragEnd : null}
     >
       {/* Rectangle */}
@@ -69,7 +69,7 @@ const CanvasRectangleWithText = ({ element, isSelected, onSelect, onChange, isEd
         verticalAlign="middle"
         wrap="word"
         padding={element.padding}
-        onClick={isEditable ? onSelect : null}
+        onClick={isEditable ? (e) => { if (e.evt.button === 0) onSelect(e.evt.shiftKey || e.evt.ctrlKey); } : null}
       />
 
       <TransformerComponent shapeRef={shapeRef} isSelected={isSelected} />

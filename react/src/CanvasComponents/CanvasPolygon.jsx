@@ -47,8 +47,8 @@ const CanvasPolygon = ({ element, isSelected, onSelect, onChange, isEditable = t
                 lineJoin={element?.lineJoin}
                 draggable={isEditable}
                 onDragEnd={isEditable ? handleDragEnd : null}
-                onClick={isEditable ? onSelect : null}
-                onTap={isEditable ? onSelect : null}
+                onClick={isEditable ? (e) => { if (e.evt.button === 0) onSelect(e.evt.shiftKey || e.evt.ctrlKey); } : null}
+                onTap={isEditable ? (e) => { if (e.evt.button === 0) onSelect(e.evt.shiftKey || e.evt.ctrlKey); } : null}
                 onTransformEnd={isEditable ? handleTransformEnd : null}
             />
             <TransformerComponent shapeRef={shapeRef} isSelected={isSelected} />
