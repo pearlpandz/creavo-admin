@@ -1,5 +1,5 @@
 import React from "react";
-import CanvasEditor from "../CanvasComponents/CanvasEditor";
+import CanvasEditor from "../components/CanvasEditor";
 
 const CreatePage = () => {
     return (
