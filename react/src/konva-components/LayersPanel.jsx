@@ -1,6 +1,6 @@
 import React from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { FaCaretDown, FaCaretRight } from "react-icons/fa";
+import { FaCaretDown, FaCaretRight, FaLayerGroup, FaPlusCircle } from "react-icons/fa";
 import { MdDragHandle } from "react-icons/md";
 
 const getLayerIcon = (type) => {
@@ -175,6 +175,12 @@ const LayersPanel = ({
           )}
         </Droppable>
       </DragDropContext>
+      {topLevelElements.length === 0 && (
+        <div className="no-layers-message">
+          <FaLayerGroup size={50} color="#ccc" />
+          <p>No layers yet. Add elements from the toolbar!</p>
+        </div>
+      )}
     </div>
   );
 };

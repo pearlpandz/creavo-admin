@@ -7,10 +7,9 @@ import KonvaBuilder from "../konva-components/KonvaBuilder";
 
 // Canvas Editor
 const CanvasEditor = ({ template, mode = "edit" }) => {
-  const [elements, setElements] = useUndoRedo([]);
-  const [templateName, setTemplateName] = useState("");
   const stageRef = useRef();
-  const [templateCategory, setTemplateCategory] = useState();
+  const [elements, setElements] = useUndoRedo([]);
+  const [templateObj, setTemplateObj] = useState({});
   const { mutate: patchMutate } = usePatchTemplate();
   const { mutate: createMutate } = useCreateTemplate();
   const mutate = mode === "edit" ? patchMutate : createMutate;
@@ -19,8 +18,11 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
     // Load initial elements from template prop
     if (template?.elements) {
       setElements(template.elements);
-      setTemplateName(template.name);
-      setTemplateCategory(template.category);
+      setTemplateObj({
+        name: template.name,
+        category: template.category,
+        state: template.state || "draft",
+      });
     } else {
       setElements([]);
     }
@@ -31,15 +33,16 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
     const dataURL = stageRef.current.toDataURL({
       pixelRatio: 0.4, // 40% resolution of actual canvas size
     });
-    const file = dataURLtoFile(dataURL, `${templateName}.png`);
+    const file = dataURLtoFile(dataURL, `${templateObj.name}.png`);
     const formdata = new FormData();
-    formdata.append("name", templateName);
+    formdata.append("name", templateObj.name);
     formdata.append("frame", file);
     formdata.append(
       "elements",
       JSON.stringify(elements?.filter((a) => Object.keys(a).length > 0))
     );
-    formdata.append("category", templateCategory);
+    formdata.append("category", templateObj.category);
+    formdata.append("state", templateObj.state || "draft");
     mutate({
       payload: formdata
     });
@@ -49,12 +52,12 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
     const dataURL = stageRef.current.toDataURL({
       pixelRatio: 0.4, // 40% resolution of actual canvas size
     });
-    const file = dataURLtoFile(dataURL, `${templateName}.png`);
+    const file = dataURLtoFile(dataURL, `${templateObj.name}.png`);
     const formdata = new FormData();
-    formdata.append("name", templateName);
+    formdata.append("name", templateObj.name);
     formdata.append("frame", file);
     formdata.append("elements", JSON.stringify(elements));
-    formdata.append("category", templateCategory);
+    formdata.append("category", templateObj.category);
     mutate({
       payload: formdata,
       id: template._id
@@ -71,7 +74,10 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
       <KonvaBuilder
         elements={elements}
         setElements={setElements}
+        templateObj={templateObj}
+        setTemplateObj={setTemplateObj}
         mode="edit"
+        stageRef={stageRef}
       />
     </>
   );

@@ -90,6 +90,8 @@ const PropertiesPanel = ({
   updateElement,
   // canvasBackgroundColor,
   // setCanvasBackgroundColor,
+  templateObj,
+  setTemplateObj,
   mode,
 }) => {
   const handleChange = (e) => {
@@ -107,6 +109,15 @@ const PropertiesPanel = ({
   const handleColorChange = (color, name) => {
     if (mode === "view") return;
     updateElement(selectedElement.id, { [name]: color });
+  };
+
+  const handleTemplateChange = (e) => {
+    if (mode === "view") return;
+    const { name, value } = e.target;
+    setTemplateObj((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   return (
@@ -127,9 +138,9 @@ const PropertiesPanel = ({
         <span style={{ ...labelStyle, minWidth: '100px' }}>TEMPLATE NAME</span>
         <input
           type="text"
-          name="templateName"
-          // value={templateName}
-          // onChange={(e) => setTemplateName(e.target.value)}
+          name="name"
+          value={templateObj?.name}
+          onChange={handleTemplateChange}
           style={{ ...inputStyle, width: "120px" }}
         />
       </div>
@@ -137,8 +148,8 @@ const PropertiesPanel = ({
         <span style={{ ...labelStyle, minWidth: '100px' }}>CATEGORY</span>
         <select
           name="category"
-          // value={category}
-          // onChange={(e) => setCategory(e.target.value)}
+          value={templateObj?.category}
+          onChange={handleTemplateChange}
           style={{ ...inputStyle, width: "120px" }}
         >
           <option value="regular">Regular</option>
@@ -150,8 +161,8 @@ const PropertiesPanel = ({
         <span style={{ ...labelStyle, minWidth: '100px' }}>STATE</span>
         <select
           name="state"
-          // value={state}
-          // onChange={(e) => setState(e.target.value)}
+          value={templateObj?.state}
+          onChange={handleTemplateChange}
           style={{ ...inputStyle, width: "120px" }}
         >
           <option value="draft">Draft</option>

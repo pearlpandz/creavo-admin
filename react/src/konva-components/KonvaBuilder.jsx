@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import Toolbar from "./Toolbar";
 import Canvas from "./Canvas";
@@ -8,13 +8,12 @@ import ContextMenu from "./ContextMenu";
 import "./KonvaBuilder.css";
 
 function KonvaBuilder(props) {
-  const { elements, setElements, handleSave, mode = "view" } = props;
+  const { elements, setElements, handleSave, mode = "view", stageRef, templateObj,
+    setTemplateObj } = props;
   const [selectedElement, setSelectedElement] = useState(null);
   const [showLayersPanel, setShowLayersPanel] = useState(mode === "edit");
   const [canvasBackgroundColor, setCanvasBackgroundColor] = useState("#ffffff");
   const [currentTool, setCurrentTool] = useState(null);
-  const stageRef = useRef();
-
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedElementsForClipping, setSelectedElementsForClipping] =
     useState([]);
@@ -527,6 +526,8 @@ function KonvaBuilder(props) {
             updateElement={updateElement}
             canvasBackgroundColor={canvasBackgroundColor}
             setCanvasBackgroundColor={setCanvasBackgroundColor}
+            templateObj={templateObj}
+            setTemplateObj={setTemplateObj}
             mode={mode}
           />
         )}
