@@ -25,3 +25,7 @@ python manage.py runserver
 How to start the local server
 > .django\Scripts\activate
 > python manage.py runserver
+
+Clear old migrations for new setup
+find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+find . -path "*/migrations/*.pyc" -delete

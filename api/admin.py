@@ -47,12 +47,12 @@ class CategoryAdminConfig(admin.ModelAdmin):
 class MediaAdminConfig(admin.ModelAdmin):
     list_display = ('image_tag', 'title',)
     filter_horizontal = ('categories', 'subcategories')  # Nice UI for multi-select
-    exclude = ['image']  # hides the field from the form
+    exclude = ['image', 'thumbnail']  # hides the field from the form
     list_per_page = 15
 
     def image_tag(self, obj):
-        if obj.image:
-            return format_html('<img src="{}" width="60" height="60" style="object-fit:cover;border-radius:4px;" />', obj.image)
+        if obj.thumbnail:
+            return format_html('<img src="{}" width="60" height="60" style="object-fit:cover;border-radius:4px;" />', obj.thumbnail)
         return "-"
     
     image_tag.short_description = 'Image'

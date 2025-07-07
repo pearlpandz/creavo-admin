@@ -1,5 +1,5 @@
 import React from "react";
-import CanvasEditor from "../CanvasComponents/CanvasEditor";
+import CanvasEditor from "../components/CanvasEditor";
 import { useParams } from "react-router";
 import { useTemplateById } from "../hook/useTemplate";
 
