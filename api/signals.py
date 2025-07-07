@@ -71,11 +71,24 @@ def upload_to_nodejs_after_save(sender, instance, created, **kwargs):
                         files = {'file': f}
                     response = requests.post(url, files=files)
 
-                print('response.status_code', response.status_code)
+                print('response.status_code', response.status_code, response.text)
                 if response.status_code == 200:
+                    update_fields = []
                     old_image = instance.image
-                    instance.image = response.json().get('url')
-                    instance.save(update_fields=['image'])
+                   
+                    json_data = response.json()
+                    update_fields = []
+
+                    if 'url' in json_data:
+                        instance.image = json_data['url']
+                        update_fields.append('image')
+
+                    if 'thumbnailUrl' in json_data:
+                        instance.thumbnail = json_data['thumbnailUrl']
+                        update_fields.append('thumbnail')
+
+                    if update_fields:
+                        instance.save(update_fields=update_fields)
                     
                     # Now that file is closed, it’s safe to delete
                     os.remove(instance.media.path) 
