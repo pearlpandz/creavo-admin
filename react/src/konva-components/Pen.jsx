@@ -137,6 +137,8 @@ export default function Pen({
     <>
       <Line
         ref={shapeRef}
+        x={x}
+        y={y}
         tension={tension}
         lineCap={lineCap}
         lineJoin={lineJoin}

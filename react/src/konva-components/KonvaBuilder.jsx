@@ -369,8 +369,8 @@ function KonvaBuilder(props) {
     if (selectedElement && selectedElement.type === "pen") {
       const newPoints = [
         ...selectedElement.points,
-        pointerPosition.x,
-        pointerPosition.y,
+        pointerPosition.x - selectedElement.x,
+        pointerPosition.y - selectedElement.y,
       ];
       updateElement(selectedElement.id, { points: newPoints });
     } else {

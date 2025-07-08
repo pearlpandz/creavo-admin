@@ -846,7 +846,7 @@ const PropertiesPanel = ({
                   min="0"
                   max="1"
                   step="0.1"
-                  value={selectedElement.tension || 0.5}
+                  value={selectedElement.tension ?? 0.5}
                   onChange={handleChange}
                   style={sliderStyle}
                 />
@@ -858,7 +858,7 @@ const PropertiesPanel = ({
                     flexShrink: 0,
                   }}
                 >
-                  {selectedElement.tension || 0.5}
+                  {selectedElement.tension ?? 0.5}
                 </span>
               </div>
               {/* Bezier properties will go here */}
