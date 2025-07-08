@@ -741,6 +741,16 @@ const PropertiesPanel = ({
                   style={inputStyle}
                 />
               </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>RADIUS</span>
+                <input
+                  type="number"
+                  name="radius"
+                  value={selectedElement.radius}
+                  onChange={handleChange}
+                  style={inputStyle}
+                />
+              </div>
             </>
           )}
 

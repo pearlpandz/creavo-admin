@@ -229,8 +229,11 @@ const ElementRenderer = ({
 
           if (child.width) updated.width = child.width * scaleX;
           if (child.height) updated.height = child.height * scaleY;
-          if (child.radius)
+          if (child.radius) {
             updated.radius = child.radius * Math.max(scaleX, scaleY);
+            updated.width = updated.radius * 2;
+            updated.height = updated.radius * 2;
+          }
           if (child.radiusX) updated.radiusX = child.radiusX * scaleX;
           if (child.radiusY) updated.radiusY = child.radiusY * scaleY;
           if (child.points) {
@@ -298,19 +301,15 @@ const ElementRenderer = ({
         ctx.arc(mask.x, mask.y, mask.radius, 0, Math.PI * 2);
       } else if (mask.type === "polygon") {
         const sides = mask.sides;
-        const radius = mask.radius ?? 100;
+        const radius = mask.radius;
         const centerX = mask.x;
         const centerY = mask.y;
-        ctx.moveTo(
-          centerX + radius * Math.cos(0),
-          centerY + radius * Math.sin(0)
-        );
-        for (let i = 1; i <= sides; i++) {
-          const angle = (i * 2 * Math.PI) / sides;
-          ctx.lineTo(
-            centerX + radius * Math.cos(angle),
-            centerY + radius * Math.sin(angle)
-          );
+        for (let i = 0; i < sides; i++) {
+          const angle = (i * 2 * Math.PI) / sides - Math.PI / 2;
+          const x = centerX + radius * Math.cos(angle);
+          const y = centerY + radius * Math.sin(angle);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
         }
         ctx.closePath();
       } else if (mask.type === "star") {

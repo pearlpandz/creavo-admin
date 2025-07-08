@@ -63,7 +63,7 @@ function KonvaBuilder(props) {
     } else if (type === "image") {
       newElement = {
         ...baseProps,
-        src: "https://frame-service.creavo.in/uploads/placeholder-image.jpg",
+        src: "https://static.vecteezy.com/system/resources/thumbnails/036/324/708/small/ai-generated-picture-of-a-tiger-walking-in-the-forest-photo.jpg",
         width: 150,
         height: 150,
       };
@@ -117,7 +117,7 @@ function KonvaBuilder(props) {
         ...baseProps,
         fill: "#aabbcc",
         sides: 6,
-        radius: 100,
+        radius: 50,
         width: 100,
         height: 100,
       };
@@ -185,13 +185,19 @@ function KonvaBuilder(props) {
             updatedEl.cornerRadiusTopRight = el.cornerRadiusTopRight;
             updatedEl.cornerRadiusBottomLeft = el.cornerRadiusBottomLeft;
             updatedEl.cornerRadiusBottomRight = el.cornerRadiusBottomRight;
-          } else if (
-            updatedEl.type === "polygon" &&
-            properties.sides !== undefined
-          ) {
-            // No specific Konva property to update based on sides directly here,
-            // Konva.RegularPolygon will use the 'sides' prop directly.
-            // Ensure 'radius' is also passed if it's a property that affects rendering.
+          } else if (updatedEl.type === "polygon") {
+            if (properties.width !== undefined || properties.height !== undefined) {
+              const newSize =
+                properties.width !== undefined
+                  ? properties.width
+                  : properties.height;
+              updatedEl.width = newSize;
+              updatedEl.height = newSize;
+              updatedEl.radius = newSize / 2;
+            } else if (properties.radius !== undefined) {
+              updatedEl.width = updatedEl.radius * 2;
+              updatedEl.height = updatedEl.radius * 2;
+            }
           }
           return updatedEl;
         }
@@ -250,8 +256,8 @@ function KonvaBuilder(props) {
       type: "group",
       x: shape.x,
       y: shape.y,
-      width: shape.width,
-      height: shape.height,
+      width: shape.type === 'polygon' ? shape.radius * 2 : shape.width,
+      height: shape.type === 'polygon' ? shape.radius * 2 : shape.height,
     };
 
     const updatedElements = elements.map((el) => {
