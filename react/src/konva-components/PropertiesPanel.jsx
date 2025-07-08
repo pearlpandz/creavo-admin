@@ -591,6 +591,48 @@ const PropertiesPanel = ({
             />
           </div>
 
+          {selectedElement.type === "image" && (
+            <>
+              <div style={rowStyle}>
+                <span style={labelStyle}>IMAGE</span>
+                <img
+                  src={selectedElement.src}
+                  alt="Selected"
+                  style={{ width: "100px", height: "auto" }}
+                />
+              </div>
+              <div style={rowStyle}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        updateElement(selectedElement.id, {
+                          src: reader.result,
+                        });
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+              </div>
+              <div style={rowStyle}>
+                <button
+                  onClick={() =>
+                    updateElement(selectedElement.id, {
+                      src: "/assets/placeholder.webp",
+                    })
+                  }
+                >
+                  Remove Image
+                </button>
+              </div>
+            </>
+          )}
+
           {selectedElement.type === "star" && (
             <>
               <div style={sectionTitleStyle}>STAR PROPERTIES</div>

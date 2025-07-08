@@ -68,14 +68,14 @@ const GeneralShape = forwardRef((props, ref) => {
       {...shapeProps}
       {...(shapeProps.type === "text"
         ? {
-            fill: shapeProps.color,
-            fontStyle:
-              `${shapeProps.fontStyle} ${shapeProps.fontWeight}`.trim(),
-            align: shapeProps.textAlign,
-            textDecoration: shapeProps.textDecoration,
-            lineHeight: shapeProps.lineHeight,
-            padding: shapeProps.padding,
-          }
+          fill: shapeProps.color,
+          fontStyle:
+            `${shapeProps.fontStyle} ${shapeProps.fontWeight}`.trim(),
+          align: shapeProps.textAlign,
+          textDecoration: shapeProps.textDecoration,
+          lineHeight: shapeProps.lineHeight,
+          padding: shapeProps.padding,
+        }
         : {})}
       {...(shapeProps.type === "pen" && props.isSelected
         ? { activatePoints: true, onPointDrag: onPointDrag }
@@ -449,14 +449,14 @@ const ElementRenderer = ({
         isSelected &&
         element.type !== "pen" &&
         element.type !== "group" && (
-        <Transformer
-          ref={trRef}
-          boundBoxFunc={(oldBox, newBox) => {
-            if (newBox.width < 5 || newBox.height < 5) return oldBox;
-            return newBox;
-          }}
-        />
-      )}
+          <Transformer
+            ref={trRef}
+            boundBoxFunc={(oldBox, newBox) => {
+              if (newBox.width < 5 || newBox.height < 5) return oldBox;
+              return newBox;
+            }}
+          />
+        )}
     </>
   );
 };
@@ -489,6 +489,17 @@ const Canvas = ({
       }
     }
   };
+
+  useEffect(() => {
+    if (stageRef.current) {
+      const container = stageRef.current.container();
+      if (currentTool === "pen") {
+        container.style.cursor = "url(/pen-tool.png) 0 24, auto";
+      } else {
+        container.style.cursor = "default";
+      }
+    }
+  }, [currentTool, stageRef]);
 
   const topLevelElements = elements.filter((el) => !el.groupId);
 

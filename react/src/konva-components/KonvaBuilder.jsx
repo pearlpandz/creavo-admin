@@ -20,6 +20,7 @@ function KonvaBuilder(props) {
 
   const addElement = (type) => {
     if (mode === "view") return;
+    setCurrentTool(type);
     const baseProps = {
       id: uuidv4(),
       type,
@@ -66,7 +67,7 @@ function KonvaBuilder(props) {
     } else if (type === "image") {
       newElement = {
         ...baseProps,
-        src: "https://static.vecteezy.com/system/resources/thumbnails/036/324/708/small/ai-generated-picture-of-a-tiger-walking-in-the-forest-photo.jpg",
+        src: "https://frame-service.creavo.in/uploads/placeholder-image.jpg",
         width: 150,
         height: 150,
       };
@@ -340,6 +341,8 @@ function KonvaBuilder(props) {
       setSelectedElementsForClipping([]);
       return;
     }
+
+    setCurrentTool(element.type);
 
     const isMultiSelect =
       event && (event.ctrlKey || event.metaKey || event.shiftKey);
