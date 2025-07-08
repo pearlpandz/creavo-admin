@@ -770,6 +770,55 @@ const PropertiesPanel = ({
                   }
                 />
               </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>LINE CAP</span>
+                <select
+                  name="lineCap"
+                  value={selectedElement.lineCap || "round"}
+                  onChange={handleChange}
+                  style={{ ...inputStyle, width: "120px" }}
+                >
+                  <option value="butt">Butt</option>
+                  <option value="round">Round</option>
+                  <option value="square">Square</option>
+                </select>
+              </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>LINE JOIN</span>
+                <select
+                  name="lineJoin"
+                  value={selectedElement.lineJoin || "round"}
+                  onChange={handleChange}
+                  style={{ ...inputStyle, width: "120px" }}
+                >
+                  <option value="bevel">Bevel</option>
+                  <option value="round">Round</option>
+                  <option value="miter">Miter</option>
+                </select>
+              </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>TENSION</span>
+                <input
+                  type="range"
+                  name="tension"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={selectedElement.tension || 0.5}
+                  onChange={handleChange}
+                  style={sliderStyle}
+                />
+                <span
+                  style={{
+                    fontSize: "13px",
+                    minWidth: "28px",
+                    textAlign: "right",
+                    flexShrink: 0,
+                  }}
+                >
+                  {selectedElement.tension || 0.5}
+                </span>
+              </div>
               {/* Bezier properties will go here */}
             </>
           )}

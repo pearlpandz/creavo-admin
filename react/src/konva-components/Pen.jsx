@@ -24,6 +24,9 @@ export default function Pen({
     strokeColor,
     strokeWidth,
     opacity = 100,
+    lineCap = "round",
+    lineJoin = "round",
+    tension = 0.5,
     ...otherRest
   } = rest;
   const konvaOpacity = opacity / 100;
@@ -134,9 +137,9 @@ export default function Pen({
     <>
       <Line
         ref={shapeRef}
-        tension={0.5}
-        lineCap="round"
-        lineJoin="round"
+        tension={tension}
+        lineCap={lineCap}
+        lineJoin={lineJoin}
         stroke={strokeColor}
         strokeWidth={strokeWidth}
         points={points}

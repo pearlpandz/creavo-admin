@@ -445,7 +445,10 @@ const ElementRenderer = ({
         onContextMenu={onContextMenu}
         mode={mode}
       />
-      {mode === "edit" && isSelected && (
+      {mode === "edit" &&
+        isSelected &&
+        element.type !== "pen" &&
+        element.type !== "group" && (
         <Transformer
           ref={trRef}
           boundBoxFunc={(oldBox, newBox) => {

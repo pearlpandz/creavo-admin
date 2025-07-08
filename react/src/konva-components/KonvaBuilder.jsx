@@ -40,6 +40,9 @@ function KonvaBuilder(props) {
         stroke: "#000000",
         strokeWidth: 2,
         isClosed: false,
+        lineCap: "round",
+        lineJoin: "round",
+        tension: 0.5,
       };
       setCurrentTool("pen");
     } else if (type === "text") {
