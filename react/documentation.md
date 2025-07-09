@@ -109,3 +109,81 @@ Templates can be saved and updated using the buttons in the navigation bar. When
 ### 4.4. Load Template
 
 Templates are loaded automatically when you navigate to the 'Edit' page. When a user clicks the 'Edit' button for a specific template on the homepage, the `templateId` is passed through the URL. The 'Edit' page then uses this `templateId` to fetch and display the saved template elements on the canvas.
+
+## 5. Color and Fill Options
+
+The Properties Panel allows you to customize the fill and stroke colors of selected elements. You can choose between solid colors, linear gradients, and radial gradients.
+
+### 5.1. Solid Color
+
+To apply a solid color fill or stroke:
+1. Select an element on the canvas.
+2. In the Properties Panel, locate the 'FILL TYPE' dropdown.
+3. Select 'Solid'.
+4. Click on the color swatch next to 'FILL COLOR' (or 'STROKE' for stroke color). A native color picker will appear.
+5. Choose your desired color.
+
+### 5.2. Linear Gradient
+
+Linear gradients blend two colors along a straight line.
+
+**Properties:**
+*   **GRADIENT COLOR 1:** The starting color of the gradient.
+*   **GRADIENT COLOR 2:** The ending color of the gradient.
+*   **START X, START Y:** Coordinates for the starting point of the gradient line.
+*   **END X, END Y:** Coordinates for the ending point of the gradient line.
+
+**How to Apply a Linear Gradient:**
+1. Select an element on the canvas.
+2. In the Properties Panel, set 'FILL TYPE' to 'Linear Gradient'.
+3. Use the color pickers to choose 'GRADIENT COLOR 1' and 'GRADIENT COLOR 2'.
+4. Adjust 'START X', 'START Y', 'END X', and 'END Y' to control the direction of the gradient, or use the 'PRESET' dropdown for common directions:
+    *   **Left to Right:** `START X: 0`, `START Y: 0`, `END X: [element_width]`, `END Y: 0`
+    *   **Right to Left:** `START X: [element_width]`, `START Y: 0`, `END X: 0`, `END Y: 0`
+    *   **Top to Bottom:** `START X: 0`, `START Y: 0`, `END X: 0`, `END Y: [element_height]`
+    *   **Bottom to Top:** `START X: 0`, `START Y: [element_height]`, `END X: 0`, `END Y: 0`
+    *   *(Note: `[element_width]` and `[element_height]` refer to the width and height of your selected element. You may need to experiment with these values to achieve the desired effect.)*
+
+### 5.3. Radial Gradient
+
+Radial gradients blend two colors outward from a central point.
+
+**Properties:**
+*   **GRADIENT COLOR 1:** The inner color of the gradient.
+*   **GRADIENT COLOR 2:** The outer color of the gradient.
+*   **START X, START Y:** Coordinates for the center of the inner circle.
+*   **END X, END Y:** Coordinates for the center of the outer circle.
+*   **START RADIUS:** The radius of the inner circle.
+*   **END RADIUS:** The radius of the outer circle.
+
+**How to Apply a Radial Gradient:**
+1. Select an element on the canvas.
+2. In the Properties Panel, set 'FILL TYPE' to 'Radial Gradient'.
+3. Use the color pickers to choose 'GRADIENT COLOR 1' and 'GRADIENT COLOR 2'.
+4. Adjust the 'START X', 'START Y', 'END X', 'END Y', 'START RADIUS', and 'END RADIUS' to control the position and size of the gradient, or use the 'PRESET' dropdown for common configurations:
+    *   **Centered:**
+        *   `START X: [element_width / 2]`, `START Y: [element_height / 2]`
+        *   `END X: [element_width / 2]`, `END Y: [element_height / 2]`
+        *   `START RADIUS: 0`
+        *   `END RADIUS: [min(element_width, element_height) / 2]`
+    *   **Leftmost:**
+        *   `START X: 0`, `START Y: [element_height / 2]`
+        *   `END X: 0`, `END Y: [element_height / 2]`
+        *   `START RADIUS: 0`
+        *   `END RADIUS: [element_width]`
+    *   **Rightmost:**
+        *   `START X: [element_width]`, `START Y: [element_height / 2]`
+        *   `END X: [element_width]`, `END Y: [element_height / 2]`
+        *   `START RADIUS: 0`
+        *   `END RADIUS: [element_width]`
+    *   **Topmost:**
+        *   `START X: [element_width / 2]`, `START Y: 0`
+        *   `END X: [element_width / 2]`, `END Y: 0`
+        *   `START RADIUS: 0`
+        *   `END RADIUS: [element_height]`
+    *   **Bottommost:**
+        *   `START X: [element_width / 2]`, `START Y: [element_height]`
+        *   `END X: [element_width / 2]`, `END Y: [element_height]`
+        *   `START RADIUS: 0`
+        *   `END RADIUS: [element_height]`
+    *   *(Note: `[element_width]` and `[element_height]` refer to the width and height of your selected element. You may need to experiment with these values to achieve the desired effect.)*

@@ -24,6 +24,58 @@ const fontFamilies = [
   "Comic Sans MS",
 ];
 
+const linearGradientPresets = {
+  "left-to-right": (width, height) => ({
+    fillLinearGradientStartPoint: { x: 0, y: height / 2 },
+    fillLinearGradientEndPoint: { x: width, y: height / 2 },
+  }),
+  "right-to-left": (width, height) => ({
+    fillLinearGradientStartPoint: { x: width, y: height / 2 },
+    fillLinearGradientEndPoint: { x: 0, y: height / 2 },
+  }),
+  "top-to-bottom": (width, height) => ({
+    fillLinearGradientStartPoint: { x: width / 2, y: 0 },
+    fillLinearGradientEndPoint: { x: width / 2, y: height },
+  }),
+  "bottom-to-top": (width, height) => ({
+    fillLinearGradientStartPoint: { x: width / 2, y: height },
+    fillLinearGradientEndPoint: { x: width / 2, y: 0 },
+  }),
+};
+
+const radialGradientPresets = {
+  centered: (width, height) => ({
+    fillRadialGradientStartPoint: { x: width / 2, y: height / 2 },
+    fillRadialGradientEndPoint: { x: width / 2, y: height / 2 },
+    fillRadialGradientStartRadius: 0,
+    fillRadialGradientEndRadius: Math.min(width, height) / 2,
+  }),
+  leftmost: (width, height) => ({
+    fillRadialGradientStartPoint: { x: 0, y: height / 2 },
+    fillRadialGradientEndPoint: { x: 0, y: height / 2 },
+    fillRadialGradientStartRadius: 0,
+    fillRadialGradientEndRadius: width,
+  }),
+  rightmost: (width, height) => ({
+    fillRadialGradientStartPoint: { x: width, y: height / 2 },
+    fillRadialGradientEndPoint: { x: width, y: height / 2 },
+    fillRadialGradientStartRadius: 0,
+    fillRadialGradientEndRadius: width,
+  }),
+  topmost: (width, height) => ({
+    fillRadialGradientStartPoint: { x: width / 2, y: 0 },
+    fillRadialGradientEndPoint: { x: width / 2, y: 0 },
+    fillRadialGradientStartRadius: 0,
+    fillRadialGradientEndRadius: height,
+  }),
+  bottommost: (width, height) => ({
+    fillRadialGradientStartPoint: { x: width / 2, y: height },
+    fillRadialGradientEndPoint: { x: width / 2, y: height },
+    fillRadialGradientStartRadius: 0,
+    fillRadialGradientEndRadius: height,
+  }),
+};
+
 const sliderStyle = { width: "100px", marginLeft: "10px" };
 const sectionTitleStyle = {
   fontWeight: "bold",
@@ -495,6 +547,25 @@ const PropertiesPanel = ({
                 />
               </div>
               <div style={rowStyle}>
+                <span style={labelStyle}>PRESET</span>
+                <select
+                  name="linearGradientPreset"
+                  onChange={(e) => {
+                    const presetFunction = linearGradientPresets[e.target.value];
+                    if (presetFunction) {
+                      updateElement(selectedElement.id, presetFunction(selectedElement.width, selectedElement.height));
+                    }
+                  }}
+                  style={{ ...inputStyle, width: "120px" }}
+                >
+                  <option value="">Select Preset</option>
+                  <option value="left-to-right">Left to Right</option>
+                  <option value="right-to-left">Right to Left</option>
+                  <option value="top-to-bottom">Top to Bottom</option>
+                  <option value="bottom-to-top">Bottom to Top</option>
+                </select>
+              </div>
+              <div style={rowStyle}>
                 <span style={labelStyle}>START X</span>
                 <input
                   type="number"
@@ -597,6 +668,26 @@ const PropertiesPanel = ({
                     });
                   }}
                 />
+              </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>PRESET</span>
+                <select
+                  name="radialGradientPreset"
+                  onChange={(e) => {
+                    const presetFunction = radialGradientPresets[e.target.value];
+                    if (presetFunction) {
+                      updateElement(selectedElement.id, presetFunction(selectedElement.width, selectedElement.height));
+                    }
+                  }}
+                  style={{ ...inputStyle, width: "120px" }}
+                >
+                  <option value="">Select Preset</option>
+                  <option value="centered">Centered</option>
+                  <option value="leftmost">Leftmost</option>
+                  <option value="rightmost">Rightmost</option>
+                  <option value="topmost">Topmost</option>
+                  <option value="bottommost">Bottommost</option>
+                </select>
               </div>
               <div style={rowStyle}>
                 <span style={labelStyle}>START X</span>
