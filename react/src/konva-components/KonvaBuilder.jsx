@@ -28,7 +28,7 @@ function KonvaBuilder(props) {
       y: 50,
       stroke: "#000000",
       strokeWidth: 2,
-      opacity: 1,
+      opacity: 100,
       slug: "",
       fillType: "solid", // "solid", "linear-gradient", "radial-gradient", "pattern"
       fillLinearGradientColorStops: [0, "#ffffff", 1, "#000000"],
