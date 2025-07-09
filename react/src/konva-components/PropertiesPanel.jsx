@@ -1106,6 +1106,22 @@ const PropertiesPanel = ({
             </>
           )}
 
+          {selectedElement.type === "circle" && (
+            <>
+              <div style={sectionTitleStyle}>CIRCLE PROPERTIES</div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>RADIUS</span>
+                <input
+                  type="number"
+                  name="radius"
+                  value={selectedElement.radius}
+                  onChange={handleChange}
+                  style={inputStyle}
+                />
+              </div>
+            </>
+          )}
+
           {selectedElement.type === "polygon" && (
             <>
               <div style={sectionTitleStyle}>POLYGON PROPERTIES</div>

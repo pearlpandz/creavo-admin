@@ -210,7 +210,7 @@ function KonvaBuilder(props) {
             updatedEl.cornerRadiusTopRight = el.cornerRadiusTopRight;
             updatedEl.cornerRadiusBottomLeft = el.cornerRadiusBottomLeft;
             updatedEl.cornerRadiusBottomRight = el.cornerRadiusBottomRight;
-          } else if (updatedEl.type === "polygon") {
+          } else if (updatedEl.type === "polygon" || updatedEl.type === "circle") {
             if (properties.width !== undefined || properties.height !== undefined) {
               const newSize =
                 properties.width !== undefined
