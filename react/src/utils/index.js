@@ -47,6 +47,24 @@ export const getFill = (element) => {
       startPoint.y -= offsetY;
       endPoint.x -= offsetX;
       endPoint.y -= offsetY;
+    } else if (element.type === "star") {
+      // For star, its local origin is its center.
+      // The gradient points from presets are relative to the bounding box's top-left.
+      // We need to shift them to be relative to the star's center (0,0 in its local system).
+      // The star's intrinsic width/height is outerRadius * 2.
+      // We need to consider the current scale of the star.
+      // Assuming scaleX and scaleY are available on the element, or default to 1.
+      const scaleX = element.scaleX !== undefined ? element.scaleX : 1;
+      const scaleY = element.scaleY !== undefined ? element.scaleY : 1;
+
+      // The offset should be based on the scaled intrinsic dimensions
+      const offsetX = (element.outerRadius * scaleX); // Half of the scaled intrinsic width
+      const offsetY = (element.outerRadius * scaleY); // Half of the scaled intrinsic height
+
+      startPoint.x -= offsetX;
+      startPoint.y -= offsetY;
+      endPoint.x -= offsetX;
+      endPoint.y -= offsetY;
     }
 
     return {

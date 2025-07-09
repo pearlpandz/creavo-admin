@@ -216,6 +216,24 @@ function KonvaBuilder(props) {
               updatedEl.width = updatedEl.radius * 2;
               updatedEl.height = updatedEl.radius * 2;
             }
+          } else if (updatedEl.type === "star") {
+            // If innerRadius or outerRadius are being updated
+            if (properties.innerRadius !== undefined || properties.outerRadius !== undefined) {
+              const oldOuterRadius = el.outerRadius; // Get the outerRadius before the update
+              const newOuterRadius = properties.outerRadius !== undefined ? properties.outerRadius : oldOuterRadius;
+
+              // Calculate the current scale based on the old outerRadius and current dimensions
+              const currentScaleX = el.width / (oldOuterRadius * 2);
+              const currentScaleY = el.height / (oldOuterRadius * 2);
+
+              // Apply the new innerRadius and outerRadius
+              updatedEl.innerRadius = properties.innerRadius !== undefined ? properties.innerRadius : el.innerRadius;
+              updatedEl.outerRadius = newOuterRadius;
+
+              // Recalculate width and height based on the new outerRadius and preserved scale
+              updatedEl.width = newOuterRadius * 2 * currentScaleX;
+              updatedEl.height = newOuterRadius * 2 * currentScaleY;
+            }
           }
           return updatedEl;
         }
