@@ -940,6 +940,7 @@ const PropertiesPanel = ({
                 <input
                   type="file"
                   accept="image/*"
+                  value={selectedElement.src ? "" : undefined}
                   onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
@@ -958,7 +959,7 @@ const PropertiesPanel = ({
                 <button
                   onClick={() =>
                     updateElement(selectedElement.id, {
-                      src: "/assets/placeholder.webp",
+                      src: "https://frame-service.creavo.in/uploads/placeholder-image.jpg",
                     })
                   }
                 >
