@@ -32,21 +32,28 @@ export const getNumericVal = (val) => val || 0;
 
 export const getFill = (element) => {
   if (element.fillType === "linear-gradient") {
+    let startPoint = { ...element.fillLinearGradientStartPoint }; // Create copies
+    let endPoint = { ...element.fillLinearGradientEndPoint };     // Create copies
+
+    // Adjust gradient points for Circle and RegularPolygon
+    // The gradient points are defined relative to a 0,0 top-left origin (like for a rect)
+    // Konva Circle/Polygon expects gradient points relative to their center (0,0 in their local coord system)
+    // So, we need to shift the points by -width/2 and -height/2
+    if (element.type === "circle" || element.type === "polygon") {
+      const offsetX = element.width / 2;
+      const offsetY = element.height / 2;
+
+      startPoint.x -= offsetX;
+      startPoint.y -= offsetY;
+      endPoint.x -= offsetX;
+      endPoint.y -= offsetY;
+    }
+
     return {
       fill: undefined, // Explicitly set fill to undefined for gradients
-      fillLinearGradientStartPoint: element.fillLinearGradientStartPoint,
-      fillLinearGradientEndPoint: element.fillLinearGradientEndPoint,
+      fillLinearGradientStartPoint: startPoint,
+      fillLinearGradientEndPoint: endPoint,
       fillLinearGradientColorStops: element.fillLinearGradientColorStops,
-    };
-  } else if (element.fillType === "radial-gradient") {
-    return {
-      fill: undefined, // Explicitly set fill to undefined for gradients
-      fillRadialGradientStartPoint: element.fillRadialGradientStartPoint,
-      fillRadialGradientEndPoint: element.fillRadialGradientEndPoint,
-      fillRadialGradientStartRadius: element.fillRadialGradientStartRadius,
-      fillRadialGradientEndRadius: element.fillRadialGradientEndRadius,
-      fillRadialGradientColorStops: element.fillRadialGradientColorStops,
-      fillPriority: "radial-gradient",
     };
   } else {
     return { fill: element.fill };

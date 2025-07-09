@@ -30,15 +30,11 @@ function KonvaBuilder(props) {
       strokeWidth: 2,
       opacity: 100,
       slug: "",
-      fillType: "solid", // "solid", "linear-gradient", "radial-gradient", "pattern"
+      fillType: "solid", // "solid", "linear-gradient", "pattern"
       fillLinearGradientColorStops: [0, "#ffffff", 1, "#000000"],
       fillLinearGradientStartPoint: { x: 0, y: 0 },
       fillLinearGradientEndPoint: { x: 100, y: 100 },
-      fillRadialGradientColorStops: [0, "#ffffff", 1, "#000000"],
-      fillRadialGradientStartPoint: { x: 50, y: 50 },
-      fillRadialGradientEndPoint: { x: 50, y: 50 },
-      fillRadialGradientStartRadius: 10,
-      fillRadialGradientEndRadius: 70,
+      
       fillPatternImage: null,
       fillPatternOffset: { x: 0, y: 0 },
       fillPatternScale: { x: 1, y: 1 },
@@ -192,10 +188,7 @@ function KonvaBuilder(props) {
             updatedEl.fillLinearGradientColorStops = [...properties.fillLinearGradientColorStops];
             updatedEl._version = Date.now();
           }
-          if (properties.fillRadialGradientColorStops) {
-            updatedEl.fillRadialGradientColorStops = [...properties.fillRadialGradientColorStops];
-            updatedEl._version = Date.now();
-          }
+          
           if (
             updatedEl.type === "line" &&
             (properties.width !== undefined || properties.height !== undefined)
@@ -327,7 +320,7 @@ function KonvaBuilder(props) {
     const updatedElements = elements
       .map((el) => {
         if (el.groupId === groupId) {
-          const { groupId, isClippingMask, ...rest } = el;
+          const { ...rest } = el;
 
           // Calculate absolute position and rotation
           const angleRad = group.rotation * Math.PI / 180; // Group's rotation
