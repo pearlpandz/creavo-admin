@@ -283,26 +283,29 @@ function KonvaBuilder(props) {
       y: shape.y,
       width: shape.type === 'polygon' ? shape.radius * 2 : shape.width,
       height: shape.type === 'polygon' ? shape.radius * 2 : shape.height,
+      rotation: shape.rotation || 0,
     };
 
     const updatedElements = elements.map((el) => {
-      if (el.id === shape.id) {
+      if (el.id === shape.id || el.id === content.id) {
+        // Calculate relative position and rotation
+        const angleRad = -newGroup.rotation * Math.PI / 180; // Inverse rotation
+        const cos = Math.cos(angleRad);
+        const sin = Math.sin(angleRad);
+
+        const translatedX = el.x - newGroup.x;
+        const translatedY = el.y - newGroup.y;
+
+        const rotatedX = translatedX * cos - translatedY * sin;
+        const rotatedY = translatedX * sin + translatedY * cos;
+
         return {
           ...el,
           groupId: groupId,
-          isClippingMask: true,
-          // x and y adjustments for group
-          x: el.x - newGroup.x,
-          y: el.y - newGroup.y,
-        };
-      }
-      if (el.id === content.id) {
-        return {
-          ...el,
-          groupId: groupId,
-          // x and y adjustments for group
-          x: el.x - newGroup.x,
-          y: el.y - newGroup.y,
+          isClippingMask: el.id === shape.id,
+          x: rotatedX,
+          y: rotatedY,
+          rotation: (el.rotation || 0) - (newGroup.rotation || 0), // Adjust child's rotation relative to group
         };
       }
       return el;
@@ -325,8 +328,21 @@ function KonvaBuilder(props) {
       .map((el) => {
         if (el.groupId === groupId) {
           const { groupId, isClippingMask, ...rest } = el;
-          console.log(groupId, isClippingMask);
-          return { ...rest, x: el.x + group.x, y: el.y + group.y };
+
+          // Calculate absolute position and rotation
+          const angleRad = group.rotation * Math.PI / 180; // Group's rotation
+          const cos = Math.cos(angleRad);
+          const sin = Math.sin(angleRad);
+
+          const rotatedX = el.x * cos - el.y * sin;
+          const rotatedY = el.x * sin + el.y * cos;
+
+          return {
+            ...rest,
+            x: rotatedX + group.x,
+            y: rotatedY + group.y,
+            rotation: (el.rotation || 0) + (group.rotation || 0), // Restore absolute rotation
+          };
         }
         return el;
       })
