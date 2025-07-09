@@ -149,7 +149,7 @@ const PropertiesPanel = ({
       updateElement(selectedElement.id, newProperties);
     } else if (type === "number") {
       updateElement(selectedElement.id, {
-        [name]: e?.target?.valueAsNumber ?? Number(value),
+        [name]: Math.round(e?.target?.valueAsNumber ?? Number(value)),
       });
     } else {
       updateElement(selectedElement.id, { [name]: value });

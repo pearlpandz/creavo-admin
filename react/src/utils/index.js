@@ -52,3 +52,13 @@ export const getFill = (element) => {
     return { fill: element.fill };
   }
 };
+
+export const roundProps = (obj, propsToRound) => {
+  const newObj = { ...obj };
+  propsToRound.forEach(prop => {
+    if (typeof newObj[prop] === 'number') {
+      newObj[prop] = Math.round(newObj[prop]);
+    }
+  });
+  return newObj;
+};
