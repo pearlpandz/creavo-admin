@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useMemo, useRef } from "react";
 import { Circle, Line } from "react-konva";
+import { getFill } from "../utils";
 
 export default function Pen({
   points,
@@ -24,9 +25,13 @@ export default function Pen({
     strokeColor,
     strokeWidth,
     opacity = 100,
+    lineCap = "round",
+    lineJoin = "round",
+    tension = 0.5,
     ...otherRest
   } = rest;
   const konvaOpacity = opacity / 100;
+  const fillProps = getFill(rest);
 
   const mappedPoints = useMemo(() => {
     if (!points) return [];
@@ -134,15 +139,17 @@ export default function Pen({
     <>
       <Line
         ref={shapeRef}
-        tension={0.5}
-        lineCap="round"
-        lineJoin="round"
+        x={x}
+        y={y}
+        tension={tension}
+        lineCap={lineCap}
+        lineJoin={lineJoin}
         stroke={strokeColor}
         strokeWidth={strokeWidth}
         points={points}
         onDragEnd={handleDragEnd}
         onTransformEnd={handleTransformEnd}
-        fill={bgColor}
+        {...fillProps}
         opacity={konvaOpacity}
         onClick={handleClick}
         onTap={handleTap}

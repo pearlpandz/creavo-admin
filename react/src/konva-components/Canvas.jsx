@@ -12,6 +12,7 @@ import {
   Group,
 } from "react-konva";
 import useImage from "use-image";
+import { getFill } from "../utils";
 import Star from "./Star";
 import Arc from "./Arc";
 import Ellipse from "./Ellipse";
@@ -20,6 +21,7 @@ import Pen from "./Pen";
 const GeneralShape = forwardRef((props, ref) => {
   const { shapeProps, onSelect, onContextMenu, onPointDrag, mode } = props;
   let KonvaShape;
+  const fillProps = getFill(shapeProps);
   switch (shapeProps.type) {
     case "rect":
     case "square":
@@ -67,15 +69,17 @@ const GeneralShape = forwardRef((props, ref) => {
       ref={ref}
       {...shapeProps}
       {...(shapeProps.type === "text"
+        ? { fill: shapeProps.color }
+        : { ...fillProps })}
+      {...(shapeProps.type === "text"
         ? {
-            fill: shapeProps.color,
-            fontStyle:
-              `${shapeProps.fontStyle} ${shapeProps.fontWeight}`.trim(),
-            align: shapeProps.textAlign,
-            textDecoration: shapeProps.textDecoration,
-            lineHeight: shapeProps.lineHeight,
-            padding: shapeProps.padding,
-          }
+          fontStyle:
+            `${shapeProps.fontStyle} ${shapeProps.fontWeight}`.trim(),
+          align: shapeProps.textAlign,
+          textDecoration: shapeProps.textDecoration,
+          lineHeight: shapeProps.lineHeight,
+          padding: shapeProps.padding,
+        }
         : {})}
       {...(shapeProps.type === "pen" && props.isSelected
         ? { activatePoints: true, onPointDrag: onPointDrag }
@@ -175,7 +179,6 @@ const ElementRenderer = ({
   onSelect,
   onChange,
   onContextMenu,
-  currentTool,
   onRemovePoint,
   mode,
 }) => {
@@ -229,8 +232,11 @@ const ElementRenderer = ({
 
           if (child.width) updated.width = child.width * scaleX;
           if (child.height) updated.height = child.height * scaleY;
-          if (child.radius)
+          if (child.radius) {
             updated.radius = child.radius * Math.max(scaleX, scaleY);
+            updated.width = updated.radius * 2;
+            updated.height = updated.radius * 2;
+          }
           if (child.radiusX) updated.radiusX = child.radiusX * scaleX;
           if (child.radiusY) updated.radiusY = child.radiusY * scaleY;
           if (child.points) {
@@ -298,19 +304,15 @@ const ElementRenderer = ({
         ctx.arc(mask.x, mask.y, mask.radius, 0, Math.PI * 2);
       } else if (mask.type === "polygon") {
         const sides = mask.sides;
-        const radius = mask.radius ?? 100;
+        const radius = mask.radius;
         const centerX = mask.x;
         const centerY = mask.y;
-        ctx.moveTo(
-          centerX + radius * Math.cos(0),
-          centerY + radius * Math.sin(0)
-        );
-        for (let i = 1; i <= sides; i++) {
-          const angle = (i * 2 * Math.PI) / sides;
-          ctx.lineTo(
-            centerX + radius * Math.cos(angle),
-            centerY + radius * Math.sin(angle)
-          );
+        for (let i = 0; i < sides; i++) {
+          const angle = (i * 2 * Math.PI) / sides - Math.PI / 2;
+          const x = centerX + radius * Math.cos(angle);
+          const y = centerY + radius * Math.sin(angle);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
         }
         ctx.closePath();
       } else if (mask.type === "star") {
@@ -366,15 +368,23 @@ const ElementRenderer = ({
         ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2);
       } else if (mask.type === "pen") {
         const points = mask.points;
-        if (points && points.length > 3) {
-          ctx.moveTo(points[0], points[1]);
-          for (let i = 2; i < points.length - 2; i += 2) {
-            const xc = (points[i] + points[i + 2]) / 2;
-            const yc = (points[i + 1] + points[i + 3]) / 2;
-            ctx.quadraticCurveTo(points[i], points[i + 1], xc, yc);
+        if (points && points.length > 1) {
+          ctx.moveTo(mask.x + points[0], mask.y + points[1]);
+          if (Number(mask.tension) === 0) {
+            // Draw straight lines if tension is 0
+            for (let i = 2; i < points.length; i += 2) {
+              ctx.lineTo(mask.x + points[i], mask.y + points[i + 1]);
+            }
+          } else {
+            // Use quadratic curves for tension > 0
+            for (let i = 2; i < points.length - 2; i += 2) {
+              const xc = (points[i] + points[i + 2]) / 2;
+              const yc = (points[i + 1] + points[i + 3]) / 2;
+              ctx.quadraticCurveTo(mask.x + points[i], mask.y + points[i + 1], mask.x + xc, mask.y + yc);
+            }
+            // last segment
+            ctx.lineTo(mask.x + points[points.length - 2], mask.y + points[points.length - 1]);
           }
-          // last segment
-          ctx.lineTo(points[points.length - 2], points[points.length - 1]);
 
           if (mask.isClosed) {
             ctx.closePath();
@@ -441,20 +451,33 @@ const ElementRenderer = ({
           onPointDrag: handlePointDrag,
           isSelected: isSelected,
           onRemovePoint: onRemovePoint,
+          fillType: element.fillType,
+          fillLinearGradientColorStops: element.fillLinearGradientColorStops,
+          fillLinearGradientStartPoint: element.fillLinearGradientStartPoint,
+          fillLinearGradientEndPoint: element.fillLinearGradientEndPoint,
+          fillRadialGradientColorStops: element.fillRadialGradientColorStops,
+          fillRadialGradientStartPoint: element.fillRadialGradientStartPoint,
+          fillRadialGradientEndPoint: element.fillRadialGradientEndPoint,
+          fillRadialGradientStartRadius: element.fillRadialGradientStartRadius,
+          fillRadialGradientEndRadius: element.fillRadialGradientEndRadius,
+          _version: element._version,
         }}
         onSelect={onSelect}
         onContextMenu={onContextMenu}
         mode={mode}
       />
-      {mode === "edit" && isSelected && (
-        <Transformer
-          ref={trRef}
-          boundBoxFunc={(oldBox, newBox) => {
-            if (newBox.width < 5 || newBox.height < 5) return oldBox;
-            return newBox;
-          }}
-        />
-      )}
+      {mode === "edit" &&
+        isSelected &&
+        element.type !== "pen" &&
+        element.type !== "group" && (
+          <Transformer
+            ref={trRef}
+            boundBoxFunc={(oldBox, newBox) => {
+              if (newBox.width < 5 || newBox.height < 5) return oldBox;
+              return newBox;
+            }}
+          />
+        )}
     </>
   );
 };
@@ -487,6 +510,17 @@ const Canvas = ({
       }
     }
   };
+
+  useEffect(() => {
+    if (stageRef.current) {
+      const container = stageRef.current.container();
+      if (currentTool === "pen") {
+        container.style.cursor = "url(/pen-tool.png) 0 24, auto";
+      } else {
+        container.style.cursor = "default";
+      }
+    }
+  }, [currentTool, stageRef]);
 
   const topLevelElements = elements.filter((el) => !el.groupId);
 

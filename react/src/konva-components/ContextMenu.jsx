@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-const ContextMenu = ({ x, y, elementId, onDelete, onDuplicate, onApplyClippingMask, onReleaseClippingMask, canApplyClippingMask, isElementClipped, onClose, mode }) => {
+const ContextMenu = ({ x, y, onDelete, onDuplicate, onApplyClippingMask, onReleaseClippingMask, canApplyClippingMask, isElementClipped, onClose, mode }) => {
   return (
     <div
       className="context-menu"

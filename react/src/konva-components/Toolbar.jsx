@@ -6,8 +6,7 @@ import {
 } from "react-icons/fa";
 import { MdFileDownload } from "react-icons/md";
 import { LuRectangleHorizontal } from "react-icons/lu";
-import { FiMinus } from "react-icons/fi";
-import { FaPen } from "react-icons/fa";
+import { FiMinus, FiPenTool } from "react-icons/fi";
 import {
   IoImageOutline,
   IoLayersOutline,
@@ -52,7 +51,7 @@ const Toolbar = ({
       )}
       {mode === "edit" && (
         <button onClick={() => addElement("pen")} title="Add Pen">
-          <FaPen />
+          <FiPenTool />
         </button>
       )}
       {mode === "edit" && (

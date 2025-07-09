@@ -20,6 +20,7 @@ function KonvaBuilder(props) {
 
   const addElement = (type) => {
     if (mode === "view") return;
+    setCurrentTool(type);
     const baseProps = {
       id: uuidv4(),
       type,
@@ -27,8 +28,21 @@ function KonvaBuilder(props) {
       y: 50,
       stroke: "#000000",
       strokeWidth: 2,
-      opacity: 100,
+      opacity: 1,
       slug: "",
+      fillType: "solid", // "solid", "linear-gradient", "radial-gradient", "pattern"
+      fillLinearGradientColorStops: [0, "#ffffff", 1, "#000000"],
+      fillLinearGradientStartPoint: { x: 0, y: 0 },
+      fillLinearGradientEndPoint: { x: 100, y: 100 },
+      fillRadialGradientColorStops: [0, "#ffffff", 1, "#000000"],
+      fillRadialGradientStartPoint: { x: 50, y: 50 },
+      fillRadialGradientEndPoint: { x: 50, y: 50 },
+      fillRadialGradientStartRadius: 10,
+      fillRadialGradientEndRadius: 70,
+      fillPatternImage: null,
+      fillPatternOffset: { x: 0, y: 0 },
+      fillPatternScale: { x: 1, y: 1 },
+      fillPatternRotation: 0,
     };
 
     let newElement;
@@ -40,6 +54,9 @@ function KonvaBuilder(props) {
         stroke: "#000000",
         strokeWidth: 2,
         isClosed: false,
+        lineCap: "round",
+        lineJoin: "round",
+        tension: 0.5,
       };
       setCurrentTool("pen");
     } else if (type === "text") {
@@ -117,7 +134,7 @@ function KonvaBuilder(props) {
         ...baseProps,
         fill: "#aabbcc",
         sides: 6,
-        radius: 100,
+        radius: 50,
         width: 100,
         height: 100,
       };
@@ -171,6 +188,14 @@ function KonvaBuilder(props) {
       elements.map((el) => {
         if (el.id === id) {
           const updatedEl = { ...el, ...properties };
+          if (properties.fillLinearGradientColorStops) {
+            updatedEl.fillLinearGradientColorStops = [...properties.fillLinearGradientColorStops];
+            updatedEl._version = Date.now();
+          }
+          if (properties.fillRadialGradientColorStops) {
+            updatedEl.fillRadialGradientColorStops = [...properties.fillRadialGradientColorStops];
+            updatedEl._version = Date.now();
+          }
           if (
             updatedEl.type === "line" &&
             (properties.width !== undefined || properties.height !== undefined)
@@ -185,13 +210,19 @@ function KonvaBuilder(props) {
             updatedEl.cornerRadiusTopRight = el.cornerRadiusTopRight;
             updatedEl.cornerRadiusBottomLeft = el.cornerRadiusBottomLeft;
             updatedEl.cornerRadiusBottomRight = el.cornerRadiusBottomRight;
-          } else if (
-            updatedEl.type === "polygon" &&
-            properties.sides !== undefined
-          ) {
-            // No specific Konva property to update based on sides directly here,
-            // Konva.RegularPolygon will use the 'sides' prop directly.
-            // Ensure 'radius' is also passed if it's a property that affects rendering.
+          } else if (updatedEl.type === "polygon") {
+            if (properties.width !== undefined || properties.height !== undefined) {
+              const newSize =
+                properties.width !== undefined
+                  ? properties.width
+                  : properties.height;
+              updatedEl.width = newSize;
+              updatedEl.height = newSize;
+              updatedEl.radius = newSize / 2;
+            } else if (properties.radius !== undefined) {
+              updatedEl.width = updatedEl.radius * 2;
+              updatedEl.height = updatedEl.radius * 2;
+            }
           }
           return updatedEl;
         }
@@ -250,8 +281,8 @@ function KonvaBuilder(props) {
       type: "group",
       x: shape.x,
       y: shape.y,
-      width: shape.width,
-      height: shape.height,
+      width: shape.type === 'polygon' ? shape.radius * 2 : shape.width,
+      height: shape.type === 'polygon' ? shape.radius * 2 : shape.height,
     };
 
     const updatedElements = elements.map((el) => {
@@ -332,6 +363,8 @@ function KonvaBuilder(props) {
       return;
     }
 
+    setCurrentTool(element.type);
+
     const isMultiSelect =
       event && (event.ctrlKey || event.metaKey || event.shiftKey);
 
@@ -357,8 +390,8 @@ function KonvaBuilder(props) {
     if (selectedElement && selectedElement.type === "pen") {
       const newPoints = [
         ...selectedElement.points,
-        pointerPosition.x,
-        pointerPosition.y,
+        pointerPosition.x - selectedElement.x,
+        pointerPosition.y - selectedElement.y,
       ];
       updateElement(selectedElement.id, { points: newPoints });
     } else {
