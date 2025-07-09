@@ -28,8 +28,21 @@ function KonvaBuilder(props) {
       y: 50,
       stroke: "#000000",
       strokeWidth: 2,
-      opacity: 100,
+      opacity: 1,
       slug: "",
+      fillType: "solid", // "solid", "linear-gradient", "radial-gradient", "pattern"
+      fillLinearGradientColorStops: [0, "#ffffff", 1, "#000000"],
+      fillLinearGradientStartPoint: { x: 0, y: 0 },
+      fillLinearGradientEndPoint: { x: 100, y: 100 },
+      fillRadialGradientColorStops: [0, "#ffffff", 1, "#000000"],
+      fillRadialGradientStartPoint: { x: 50, y: 50 },
+      fillRadialGradientEndPoint: { x: 50, y: 50 },
+      fillRadialGradientStartRadius: 10,
+      fillRadialGradientEndRadius: 70,
+      fillPatternImage: null,
+      fillPatternOffset: { x: 0, y: 0 },
+      fillPatternScale: { x: 1, y: 1 },
+      fillPatternRotation: 0,
     };
 
     let newElement;
@@ -175,6 +188,14 @@ function KonvaBuilder(props) {
       elements.map((el) => {
         if (el.id === id) {
           const updatedEl = { ...el, ...properties };
+          if (properties.fillLinearGradientColorStops) {
+            updatedEl.fillLinearGradientColorStops = [...properties.fillLinearGradientColorStops];
+            updatedEl._version = Date.now();
+          }
+          if (properties.fillRadialGradientColorStops) {
+            updatedEl.fillRadialGradientColorStops = [...properties.fillRadialGradientColorStops];
+            updatedEl._version = Date.now();
+          }
           if (
             updatedEl.type === "line" &&
             (properties.width !== undefined || properties.height !== undefined)

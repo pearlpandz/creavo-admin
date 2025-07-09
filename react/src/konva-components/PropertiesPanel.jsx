@@ -436,12 +436,251 @@ const PropertiesPanel = ({
             </>
           )}
           <div style={rowStyle}>
-            <span style={labelStyle}>FILL</span>
-            <ColorPickerInput
-              color={selectedElement.fill}
-              onChange={(color) => handleColorChange(color, "fill")}
-            />
+            <span style={labelStyle}>FILL TYPE</span>
+            <select
+              name="fillType"
+              value={selectedElement.fillType || "solid"}
+              onChange={handleChange}
+              style={{ ...inputStyle, width: "120px" }}
+            >
+              <option value="solid">Solid</option>
+              <option value="linear-gradient">Linear Gradient</option>
+              <option value="radial-gradient">Radial Gradient</option>
+            </select>
           </div>
+          {selectedElement.fillType === "solid" && (
+            <div style={rowStyle}>
+              <span style={labelStyle}>FILL COLOR</span>
+              <ColorPickerInput
+                color={selectedElement.fill}
+                onChange={(color) => handleColorChange(color, "fill")}
+              />
+            </div>
+          )}
+          {selectedElement.fillType === "linear-gradient" && (
+            <>
+              <div style={rowStyle}>
+                <span style={labelStyle}>GRADIENT COLOR 1</span>
+                <ColorPickerInput
+                  color={selectedElement.fillLinearGradientColorStops[1]}
+                  onChange={(color) => {
+                    const newStops = [
+                      selectedElement.fillLinearGradientColorStops[0],
+                      color,
+                      selectedElement.fillLinearGradientColorStops[2],
+                      selectedElement.fillLinearGradientColorStops[3],
+                    ];
+                    updateElement(selectedElement.id, {
+                      fillLinearGradientColorStops: newStops,
+                    });
+                  }}
+                />
+              </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>GRADIENT COLOR 2</span>
+                <ColorPickerInput
+                  color={selectedElement.fillLinearGradientColorStops[3]}
+                  onChange={(color) => {
+                    const newStops = [
+                      selectedElement.fillLinearGradientColorStops[0],
+                      selectedElement.fillLinearGradientColorStops[1],
+                      selectedElement.fillLinearGradientColorStops[2],
+                      color,
+                    ];
+                    updateElement(selectedElement.id, {
+                      fillLinearGradientColorStops: newStops,
+                    });
+                  }}
+                />
+              </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>START X</span>
+                <input
+                  type="number"
+                  name="fillLinearGradientStartPoint.x"
+                  value={selectedElement.fillLinearGradientStartPoint.x}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, {
+                      fillLinearGradientStartPoint: {
+                        ...selectedElement.fillLinearGradientStartPoint,
+                        x: e.target.valueAsNumber,
+                      },
+                    })
+                  }
+                  style={inputStyle}
+                />
+                <span style={labelStyle}>START Y</span>
+                <input
+                  type="number"
+                  name="fillLinearGradientStartPoint.y"
+                  value={selectedElement.fillLinearGradientStartPoint.y}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, {
+                      fillLinearGradientStartPoint: {
+                        ...selectedElement.fillLinearGradientStartPoint,
+                        y: e.target.valueAsNumber,
+                      },
+                    })
+                  }
+                  style={inputStyle}
+                />
+              </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>END X</span>
+                <input
+                  type="number"
+                  name="fillLinearGradientEndPoint.x"
+                  value={selectedElement.fillLinearGradientEndPoint.x}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, {
+                      fillLinearGradientEndPoint: {
+                        ...selectedElement.fillLinearGradientEndPoint,
+                        x: e.target.valueAsNumber,
+                      },
+                    })
+                  }
+                  style={inputStyle}
+                />
+                <span style={labelStyle}>END Y</span>
+                <input
+                  type="number"
+                  name="fillLinearGradientEndPoint.y"
+                  value={selectedElement.fillLinearGradientEndPoint.y}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, {
+                      fillLinearGradientEndPoint: {
+                        ...selectedElement.fillLinearGradientEndPoint,
+                        y: e.target.valueAsNumber,
+                      },
+                    })
+                  }
+                  style={inputStyle}
+                />
+              </div>
+            </>
+          )}
+          {selectedElement.fillType === "radial-gradient" && (
+            <>
+              <div style={rowStyle}>
+                <span style={labelStyle}>GRADIENT COLOR 1</span>
+                <ColorPickerInput
+                  color={selectedElement.fillRadialGradientColorStops[1]}
+                  onChange={(color) => {
+                    const newStops = [
+                      selectedElement.fillRadialGradientColorStops[0],
+                      color,
+                      selectedElement.fillRadialGradientColorStops[2],
+                      selectedElement.fillRadialGradientColorStops[3],
+                    ];
+                    updateElement(selectedElement.id, {
+                      fillRadialGradientColorStops: newStops,
+                    });
+                  }}
+                />
+              </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>GRADIENT COLOR 2</span>
+                <ColorPickerInput
+                  color={selectedElement.fillRadialGradientColorStops[3]}
+                  onChange={(color) => {
+                    const newStops = [
+                      selectedElement.fillRadialGradientColorStops[0],
+                      selectedElement.fillRadialGradientColorStops[1],
+                      selectedElement.fillRadialGradientColorStops[2],
+                      color,
+                    ];
+                    updateElement(selectedElement.id, {
+                      fillRadialGradientColorStops: newStops,
+                    });
+                  }}
+                />
+              </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>START X</span>
+                <input
+                  type="number"
+                  name="fillRadialGradientStartPoint.x"
+                  value={selectedElement.fillRadialGradientStartPoint.x}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, {
+                      fillRadialGradientStartPoint: {
+                        ...selectedElement.fillRadialGradientStartPoint,
+                        x: e.target.valueAsNumber,
+                      },
+                    })
+                  }
+                  style={inputStyle}
+                />
+                <span style={labelStyle}>START Y</span>
+                <input
+                  type="number"
+                  name="fillRadialGradientStartPoint.y"
+                  value={selectedElement.fillRadialGradientStartPoint.y}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, {
+                      fillRadialGradientStartPoint: {
+                        ...selectedElement.fillRadialGradientStartPoint,
+                        y: e.target.valueAsNumber,
+                      },
+                    })
+                  }
+                  style={inputStyle}
+                />
+              </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>END X</span>
+                <input
+                  type="number"
+                  name="fillRadialGradientEndPoint.x"
+                  value={selectedElement.fillRadialGradientEndPoint.x}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, {
+                      fillRadialGradientEndPoint: {
+                        ...selectedElement.fillRadialGradientEndPoint,
+                        x: e.target.valueAsNumber,
+                      },
+                    })
+                  }
+                  style={inputStyle}
+                />
+                <span style={labelStyle}>END Y</span>
+                <input
+                  type="number"
+                  name="fillRadialGradientEndPoint.y"
+                  value={selectedElement.fillRadialGradientEndPoint.y}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, {
+                      fillRadialGradientEndPoint: {
+                        ...selectedElement.fillRadialGradientEndPoint,
+                        y: e.target.valueAsNumber,
+                      },
+                    })
+                  }
+                  style={inputStyle}
+                />
+              </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>START RADIUS</span>
+                <input
+                  type="number"
+                  name="fillRadialGradientStartRadius"
+                  value={selectedElement.fillRadialGradientStartRadius}
+                  onChange={handleChange}
+                  style={inputStyle}
+                />
+              </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>END RADIUS</span>
+                <input
+                  type="number"
+                  name="fillRadialGradientEndRadius"
+                  value={selectedElement.fillRadialGradientEndRadius}
+                  onChange={handleChange}
+                  style={inputStyle}
+                />
+              </div>
+            </>
+          )}
           <div style={rowStyle}>
             <span style={labelStyle}>STROKE</span>
             <ColorPickerInput
@@ -560,7 +799,7 @@ const PropertiesPanel = ({
                 flexShrink: 0,
               }}
             >
-              {selectedElement.opacity}
+              {(selectedElement.opacity * 100).toFixed(0)}%
             </span>
           </div>
 

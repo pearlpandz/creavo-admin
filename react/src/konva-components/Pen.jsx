@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useMemo, useRef } from "react";
 import { Circle, Line } from "react-konva";
+import { getFill } from "../utils";
 
 export default function Pen({
   points,
@@ -30,6 +31,7 @@ export default function Pen({
     ...otherRest
   } = rest;
   const konvaOpacity = opacity / 100;
+  const fillProps = getFill(rest);
 
   const mappedPoints = useMemo(() => {
     if (!points) return [];
@@ -147,7 +149,7 @@ export default function Pen({
         points={points}
         onDragEnd={handleDragEnd}
         onTransformEnd={handleTransformEnd}
-        fill={bgColor}
+        {...fillProps}
         opacity={konvaOpacity}
         onClick={handleClick}
         onTap={handleTap}

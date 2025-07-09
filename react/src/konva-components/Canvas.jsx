@@ -12,6 +12,7 @@ import {
   Group,
 } from "react-konva";
 import useImage from "use-image";
+import { getFill } from "../utils";
 import Star from "./Star";
 import Arc from "./Arc";
 import Ellipse from "./Ellipse";
@@ -20,6 +21,7 @@ import Pen from "./Pen";
 const GeneralShape = forwardRef((props, ref) => {
   const { shapeProps, onSelect, onContextMenu, onPointDrag, mode } = props;
   let KonvaShape;
+  const fillProps = getFill(shapeProps);
   switch (shapeProps.type) {
     case "rect":
     case "square":
@@ -67,8 +69,10 @@ const GeneralShape = forwardRef((props, ref) => {
       ref={ref}
       {...shapeProps}
       {...(shapeProps.type === "text"
+        ? { fill: shapeProps.color }
+        : { ...fillProps })}
+      {...(shapeProps.type === "text"
         ? {
-          fill: shapeProps.color,
           fontStyle:
             `${shapeProps.fontStyle} ${shapeProps.fontWeight}`.trim(),
           align: shapeProps.textAlign,
@@ -175,7 +179,6 @@ const ElementRenderer = ({
   onSelect,
   onChange,
   onContextMenu,
-  currentTool,
   onRemovePoint,
   mode,
 }) => {
@@ -448,6 +451,16 @@ const ElementRenderer = ({
           onPointDrag: handlePointDrag,
           isSelected: isSelected,
           onRemovePoint: onRemovePoint,
+          fillType: element.fillType,
+          fillLinearGradientColorStops: element.fillLinearGradientColorStops,
+          fillLinearGradientStartPoint: element.fillLinearGradientStartPoint,
+          fillLinearGradientEndPoint: element.fillLinearGradientEndPoint,
+          fillRadialGradientColorStops: element.fillRadialGradientColorStops,
+          fillRadialGradientStartPoint: element.fillRadialGradientStartPoint,
+          fillRadialGradientEndPoint: element.fillRadialGradientEndPoint,
+          fillRadialGradientStartRadius: element.fillRadialGradientStartRadius,
+          fillRadialGradientEndRadius: element.fillRadialGradientEndRadius,
+          _version: element._version,
         }}
         onSelect={onSelect}
         onContextMenu={onContextMenu}

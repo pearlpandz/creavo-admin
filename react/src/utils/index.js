@@ -29,3 +29,26 @@ export const getRelativePointerPosition = (node) => {
 };
 
 export const getNumericVal = (val) => val || 0;
+
+export const getFill = (element) => {
+  if (element.fillType === "linear-gradient") {
+    return {
+      fill: undefined, // Explicitly set fill to undefined for gradients
+      fillLinearGradientStartPoint: element.fillLinearGradientStartPoint,
+      fillLinearGradientEndPoint: element.fillLinearGradientEndPoint,
+      fillLinearGradientColorStops: element.fillLinearGradientColorStops,
+    };
+  } else if (element.fillType === "radial-gradient") {
+    return {
+      fill: undefined, // Explicitly set fill to undefined for gradients
+      fillRadialGradientStartPoint: element.fillRadialGradientStartPoint,
+      fillRadialGradientEndPoint: element.fillRadialGradientEndPoint,
+      fillRadialGradientStartRadius: element.fillRadialGradientStartRadius,
+      fillRadialGradientEndRadius: element.fillRadialGradientEndRadius,
+      fillRadialGradientColorStops: element.fillRadialGradientColorStops,
+      fillPriority: "radial-gradient",
+    };
+  } else {
+    return { fill: element.fill };
+  }
+};
