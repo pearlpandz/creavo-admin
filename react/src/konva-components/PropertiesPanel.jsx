@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { HexColorPicker } from "react-colorful";
+import React from "react";
 import {
   FaBold,
   FaItalic,
@@ -24,33 +23,6 @@ const fontFamilies = [
   "Impact",
   "Comic Sans MS",
 ];
-
-const ColorPickerInput = ({ color, onChange }) => {
-  const [displayColorPicker, setDisplayColorPicker] = useState(false);
-
-  const handleClick = (e) => {
-    e.stopPropagation(); // Stop event propagation
-    setDisplayColorPicker(!displayColorPicker);
-  };
-
-  const handleClose = () => {
-    setDisplayColorPicker(false);
-  };
-
-  return (
-    <div className="color-picker-input">
-      <div className="color-swatch" onClick={handleClick}>
-        <div style={{ backgroundColor: color }} className="color" />
-      </div>
-      {displayColorPicker ? (
-        <div className="color-picker-popover">
-          <div className="color-picker-cover" onClick={handleClose} />
-          <HexColorPicker color={color} onChange={onChange} />
-        </div>
-      ) : null}
-    </div>
-  );
-};
 
 const sliderStyle = { width: "100px", marginLeft: "10px" };
 const sectionTitleStyle = {
@@ -97,7 +69,33 @@ const PropertiesPanel = ({
   const handleChange = (e) => {
     if (mode === "view") return;
     const { name, value, type } = e.target;
-    if (type === "number") {
+
+    if (name === "fillType") {
+      let newProperties = { [name]: value };
+      if (value === "linear-gradient") {
+        newProperties = {
+          ...newProperties,
+          fillLinearGradientColorStops: [0, "#ff0000", 1, "#0000ff"],
+          fillLinearGradientStartPoint: { x: 0, y: 0 },
+          fillLinearGradientEndPoint: { x: 100, y: 100 },
+        };
+      } else if (value === "radial-gradient") {
+        newProperties = {
+          ...newProperties,
+          fillRadialGradientColorStops: [0, "#ff0000", 1, "#0000ff"],
+          fillRadialGradientStartPoint: { x: 0, y: 0 },
+          fillRadialGradientEndPoint: { x: 50, y: 50 },
+          fillRadialGradientStartRadius: 0,
+          fillRadialGradientEndRadius: 50,
+        };
+      } else if (value === "solid") {
+        newProperties = {
+          ...newProperties,
+          fill: "#000000", // Default solid color
+        };
+      }
+      updateElement(selectedElement.id, newProperties);
+    } else if (type === "number") {
       updateElement(selectedElement.id, {
         [name]: e?.target?.valueAsNumber ?? Number(value),
       });
@@ -448,12 +446,13 @@ const PropertiesPanel = ({
               <option value="radial-gradient">Radial Gradient</option>
             </select>
           </div>
-          {selectedElement.fillType === "solid" && (
+          {(selectedElement.fillType === "solid" || !selectedElement.fillType) && (
             <div style={rowStyle}>
               <span style={labelStyle}>FILL COLOR</span>
-              <ColorPickerInput
-                color={selectedElement.fill}
-                onChange={(color) => handleColorChange(color, "fill")}
+              <input
+                type="color"
+                value={selectedElement.fill}
+                onChange={(e) => handleColorChange(e.target.value, "fill")}
               />
             </div>
           )}
@@ -461,12 +460,13 @@ const PropertiesPanel = ({
             <>
               <div style={rowStyle}>
                 <span style={labelStyle}>GRADIENT COLOR 1</span>
-                <ColorPickerInput
-                  color={selectedElement.fillLinearGradientColorStops[1]}
-                  onChange={(color) => {
+                <input
+                  type="color"
+                  value={selectedElement.fillLinearGradientColorStops[1]}
+                  onChange={(e) => {
                     const newStops = [
                       selectedElement.fillLinearGradientColorStops[0],
-                      color,
+                      e.target.value,
                       selectedElement.fillLinearGradientColorStops[2],
                       selectedElement.fillLinearGradientColorStops[3],
                     ];
@@ -478,14 +478,15 @@ const PropertiesPanel = ({
               </div>
               <div style={rowStyle}>
                 <span style={labelStyle}>GRADIENT COLOR 2</span>
-                <ColorPickerInput
-                  color={selectedElement.fillLinearGradientColorStops[3]}
-                  onChange={(color) => {
+                <input
+                  type="color"
+                  value={selectedElement.fillLinearGradientColorStops[3]}
+                  onChange={(e) => {
                     const newStops = [
                       selectedElement.fillLinearGradientColorStops[0],
                       selectedElement.fillLinearGradientColorStops[1],
                       selectedElement.fillLinearGradientColorStops[2],
-                      color,
+                      e.target.value,
                     ];
                     updateElement(selectedElement.id, {
                       fillLinearGradientColorStops: newStops,
@@ -563,12 +564,13 @@ const PropertiesPanel = ({
             <>
               <div style={rowStyle}>
                 <span style={labelStyle}>GRADIENT COLOR 1</span>
-                <ColorPickerInput
-                  color={selectedElement.fillRadialGradientColorStops[1]}
-                  onChange={(color) => {
+                <input
+                  type="color"
+                  value={selectedElement.fillRadialGradientColorStops[1]}
+                  onChange={(e) => {
                     const newStops = [
                       selectedElement.fillRadialGradientColorStops[0],
-                      color,
+                      e.target.value,
                       selectedElement.fillRadialGradientColorStops[2],
                       selectedElement.fillRadialGradientColorStops[3],
                     ];
@@ -580,14 +582,15 @@ const PropertiesPanel = ({
               </div>
               <div style={rowStyle}>
                 <span style={labelStyle}>GRADIENT COLOR 2</span>
-                <ColorPickerInput
-                  color={selectedElement.fillRadialGradientColorStops[3]}
-                  onChange={(color) => {
+                <input
+                  type="color"
+                  value={selectedElement.fillRadialGradientColorStops[3]}
+                  onChange={(e) => {
                     const newStops = [
                       selectedElement.fillRadialGradientColorStops[0],
                       selectedElement.fillRadialGradientColorStops[1],
                       selectedElement.fillRadialGradientColorStops[2],
-                      color,
+                      e.target.value,
                     ];
                     updateElement(selectedElement.id, {
                       fillRadialGradientColorStops: newStops,
@@ -683,9 +686,10 @@ const PropertiesPanel = ({
           )}
           <div style={rowStyle}>
             <span style={labelStyle}>STROKE</span>
-            <ColorPickerInput
-              color={selectedElement.stroke}
-              onChange={(color) => handleColorChange(color, "stroke")}
+            <input
+              type="color"
+              value={selectedElement.stroke}
+              onChange={(e) => handleColorChange(e.target.value, "stroke")}
             />
             <input
               type="number"
@@ -697,9 +701,10 @@ const PropertiesPanel = ({
           </div>
           <div style={rowStyle}>
             <span style={labelStyle}>COLOR</span>
-            <ColorPickerInput
-              color={selectedElement.color}
-              onChange={(color) => handleColorChange(color, "color")}
+            <input
+              type="color"
+              value={selectedElement.color}
+              onChange={(e) => handleColorChange(e.target.value, "color")}
             />
           </div>
           {(selectedElement.type === "rect" ||
