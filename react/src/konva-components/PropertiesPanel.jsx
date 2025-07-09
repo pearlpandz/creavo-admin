@@ -149,7 +149,7 @@ const PropertiesPanel = ({
       updateElement(selectedElement.id, newProperties);
     } else if (type === "number") {
       updateElement(selectedElement.id, {
-        [name]: e?.target?.valueAsNumber ?? Number(value),
+        [name]: Math.round(e?.target?.valueAsNumber ?? Number(value)),
       });
     } else {
       updateElement(selectedElement.id, { [name]: value });
@@ -1099,6 +1099,22 @@ const PropertiesPanel = ({
                   type="number"
                   name="radiusY"
                   value={selectedElement.radiusY}
+                  onChange={handleChange}
+                  style={inputStyle}
+                />
+              </div>
+            </>
+          )}
+
+          {selectedElement.type === "circle" && (
+            <>
+              <div style={sectionTitleStyle}>CIRCLE PROPERTIES</div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>RADIUS</span>
+                <input
+                  type="number"
+                  name="radius"
+                  value={selectedElement.radius}
                   onChange={handleChange}
                   style={inputStyle}
                 />

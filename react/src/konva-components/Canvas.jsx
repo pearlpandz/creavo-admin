@@ -1,4 +1,6 @@
 import React, { useRef, useEffect, forwardRef } from "react";
+
+import { roundProps } from "../utils";
 import {
   Stage,
   Layer,
@@ -208,7 +210,10 @@ const ElementRenderer = ({
 
   const handleDragEnd = (e) => {
     if (mode === "edit") {
-      onChange(element.id, { x: e.target.x(), y: e.target.y() });
+      onChange(element.id, {
+        x: Math.round(e.target.x()),
+        y: Math.round(e.target.y()),
+      });
     }
   };
 
@@ -247,17 +252,17 @@ const ElementRenderer = ({
             );
           }
 
-          onChange(child.id, updated);
+          onChange(child.id, roundProps(updated, ["x", "y", "width", "height", "radius", "radiusX", "radiusY"]));
         });
 
         // Update group position after scale
-        onChange(element.id, {
+        onChange(element.id, roundProps({
           x: node.x(),
           y: node.y(),
           width: element.width * scaleX,
           height: element.height * scaleY,
           _version: Date.now(),
-        });
+        }, ["x", "y", "width", "height"]));
 
         return;
       }
@@ -283,7 +288,7 @@ const ElementRenderer = ({
         updatedProps.radiusY = updatedProps.height / 2;
       }
 
-      onChange(element.id, updatedProps);
+      onChange(element.id, roundProps(updatedProps, ["x", "y", "width", "height", "rotation", "radiusX", "radiusY"]));
     }
   };
 
