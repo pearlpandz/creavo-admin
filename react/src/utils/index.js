@@ -31,51 +31,105 @@ export const getRelativePointerPosition = (node) => {
 export const getNumericVal = (val) => val || 0;
 
 export const getFill = (element) => {
-  if (element.fillType === "linear-gradient") {
-    let startPoint = { ...element.fillLinearGradientStartPoint }; // Create copies
-    let endPoint = { ...element.fillLinearGradientEndPoint };     // Create copies
+  if (element.fillType !== "linear-gradient") {
+    return { fill: element.fill };
+  }
 
-    // Adjust gradient points for Circle and RegularPolygon
-    // The gradient points are defined relative to a 0,0 top-left origin (like for a rect)
-    // Konva Circle/Polygon expects gradient points relative to their center (0,0 in their local coord system)
-    // So, we need to shift the points by -width/2 and -height/2
+  if (
+    !element.fillLinearGradientStartPoint ||
+    !element.fillLinearGradientEndPoint ||
+    !element.fillLinearGradientColorStops
+  ) {
+    return { fill: element.fill || "transparent" };
+  }
+
+  let startPoint = { ...element.fillLinearGradientStartPoint };
+  let endPoint = { ...element.fillLinearGradientEndPoint };
+
+  if (element.type === "pen") {
+    // Special handling for pen tool
+    if (!element.points || element.points.length < 2) {
+      return { fill: element.fill || "transparent" };
+    }
+
+    let minX = Infinity,
+      minY = Infinity,
+      maxX = -Infinity,
+      maxY = -Infinity;
+    for (let i = 0; i < element.points.length; i += 2) {
+      if (
+        element.points[i + 1] === undefined ||
+        !isFinite(element.points[i]) ||
+        !isFinite(element.points[i + 1])
+      )
+        continue;
+      minX = Math.min(minX, element.points[i]);
+      minY = Math.min(minY, element.points[i + 1]);
+      maxX = Math.max(maxX, element.points[i]);
+      maxY = Math.max(maxY, element.points[i + 1]);
+    }
+
+    if (!isFinite(minX)) {
+      // Only need to check one, they'll all be Infinity if points are bad
+      return { fill: element.fill || "transparent" };
+    }
+
+    const hasFiniteGradientPoints =
+      isFinite(startPoint.x) &&
+      isFinite(startPoint.y) &&
+      isFinite(endPoint.x) &&
+      isFinite(endPoint.y);
+
+    if (!hasFiniteGradientPoints) {
+      // Preset calculation failed, create a default gradient geometry
+      const width = maxX - minX;
+      const height = maxY - minY;
+      startPoint = { x: 0, y: height / 2 }; // Default to left-to-right
+      endPoint = { x: width, y: height / 2 };
+    }
+
+    // Offset the gradient to the bounding box origin
+    startPoint.x += minX;
+    startPoint.y += minY;
+    endPoint.x += minX;
+    endPoint.y += minY;
+  } else {
+    // Common logic for all other shapes
+    if (
+      !isFinite(startPoint.x) ||
+      !isFinite(startPoint.y) ||
+      !isFinite(endPoint.x) ||
+      !isFinite(endPoint.y)
+    ) {
+      return { fill: element.fill || "transparent" };
+    }
+
     if (element.type === "circle" || element.type === "polygon") {
       const offsetX = element.width / 2;
       const offsetY = element.height / 2;
-
       startPoint.x -= offsetX;
       startPoint.y -= offsetY;
       endPoint.x -= offsetX;
       endPoint.y -= offsetY;
     } else if (element.type === "star") {
-      // For star, its local origin is its center.
-      // The gradient points from presets are relative to the bounding box's top-left.
-      // We need to shift them to be relative to the star's center (0,0 in its local system).
-      // The star's intrinsic width/height is outerRadius * 2.
-      // We need to consider the current scale of the star.
-      // Assuming scaleX and scaleY are available on the element, or default to 1.
       const scaleX = element.scaleX !== undefined ? element.scaleX : 1;
       const scaleY = element.scaleY !== undefined ? element.scaleY : 1;
-
-      // The offset should be based on the scaled intrinsic dimensions
-      const offsetX = (element.outerRadius * scaleX); // Half of the scaled intrinsic width
-      const offsetY = (element.outerRadius * scaleY); // Half of the scaled intrinsic height
-
+      const offsetX = element.outerRadius * scaleX;
+      const offsetY = element.outerRadius * scaleY;
       startPoint.x -= offsetX;
       startPoint.y -= offsetY;
       endPoint.x -= offsetX;
       endPoint.y -= offsetY;
     }
-
-    return {
-      fill: undefined, // Explicitly set fill to undefined for gradients
-      fillLinearGradientStartPoint: startPoint,
-      fillLinearGradientEndPoint: endPoint,
-      fillLinearGradientColorStops: element.fillLinearGradientColorStops,
-    };
-  } else {
-    return { fill: element.fill };
+    // For other shapes like 'rect', no adjustment is needed as their origin is top-left.
   }
+
+  return {
+    fill: undefined,
+    fillLinearGradientStartPoint: startPoint,
+    fillLinearGradientEndPoint: endPoint,
+    fillLinearGradientColorStops: element.fillLinearGradientColorStops,
+  };
 };
 
 export const roundProps = (obj, propsToRound) => {

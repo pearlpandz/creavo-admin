@@ -516,8 +516,17 @@ const PropertiesPanel = ({
                     const presetName = e.target.value;
                     const presetFunction = linearGradientPresets[presetName];
                     if (presetFunction) {
+                      let { width, height } = selectedElement;
+                      // For pen, we must calculate width/height from points
+                      if (selectedElement.type === "pen" && selectedElement.points) {
+                        const xs = selectedElement.points.filter((_, i) => i % 2 === 0);
+                        const ys = selectedElement.points.filter((_, i) => i % 2 !== 0);
+                        width = Math.max(...xs) - Math.min(...xs);
+                        height = Math.max(...ys) - Math.min(...ys);
+                      }
+
                       updateElement(selectedElement.id, {
-                        ...presetFunction(selectedElement.width, selectedElement.height),
+                        ...presetFunction(width, height),
                         linearGradientPresetName: presetName,
                       });
                     }
