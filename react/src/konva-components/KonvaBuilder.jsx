@@ -28,17 +28,13 @@ function KonvaBuilder(props) {
       y: 50,
       stroke: "#000000",
       strokeWidth: 2,
-      opacity: 1,
+      opacity: 100,
       slug: "",
-      fillType: "solid", // "solid", "linear-gradient", "radial-gradient", "pattern"
+      fillType: "solid", // "solid", "linear-gradient", "pattern"
       fillLinearGradientColorStops: [0, "#ffffff", 1, "#000000"],
       fillLinearGradientStartPoint: { x: 0, y: 0 },
       fillLinearGradientEndPoint: { x: 100, y: 100 },
-      fillRadialGradientColorStops: [0, "#ffffff", 1, "#000000"],
-      fillRadialGradientStartPoint: { x: 50, y: 50 },
-      fillRadialGradientEndPoint: { x: 50, y: 50 },
-      fillRadialGradientStartRadius: 10,
-      fillRadialGradientEndRadius: 70,
+      
       fillPatternImage: null,
       fillPatternOffset: { x: 0, y: 0 },
       fillPatternScale: { x: 1, y: 1 },
@@ -192,10 +188,7 @@ function KonvaBuilder(props) {
             updatedEl.fillLinearGradientColorStops = [...properties.fillLinearGradientColorStops];
             updatedEl._version = Date.now();
           }
-          if (properties.fillRadialGradientColorStops) {
-            updatedEl.fillRadialGradientColorStops = [...properties.fillRadialGradientColorStops];
-            updatedEl._version = Date.now();
-          }
+          
           if (
             updatedEl.type === "line" &&
             (properties.width !== undefined || properties.height !== undefined)
@@ -222,6 +215,24 @@ function KonvaBuilder(props) {
             } else if (properties.radius !== undefined) {
               updatedEl.width = updatedEl.radius * 2;
               updatedEl.height = updatedEl.radius * 2;
+            }
+          } else if (updatedEl.type === "star") {
+            // If innerRadius or outerRadius are being updated
+            if (properties.innerRadius !== undefined || properties.outerRadius !== undefined) {
+              const oldOuterRadius = el.outerRadius; // Get the outerRadius before the update
+              const newOuterRadius = properties.outerRadius !== undefined ? properties.outerRadius : oldOuterRadius;
+
+              // Calculate the current scale based on the old outerRadius and current dimensions
+              const currentScaleX = el.width / (oldOuterRadius * 2);
+              const currentScaleY = el.height / (oldOuterRadius * 2);
+
+              // Apply the new innerRadius and outerRadius
+              updatedEl.innerRadius = properties.innerRadius !== undefined ? properties.innerRadius : el.innerRadius;
+              updatedEl.outerRadius = newOuterRadius;
+
+              // Recalculate width and height based on the new outerRadius and preserved scale
+              updatedEl.width = newOuterRadius * 2 * currentScaleX;
+              updatedEl.height = newOuterRadius * 2 * currentScaleY;
             }
           }
           return updatedEl;
@@ -327,7 +338,7 @@ function KonvaBuilder(props) {
     const updatedElements = elements
       .map((el) => {
         if (el.groupId === groupId) {
-          const { groupId, isClippingMask, ...rest } = el;
+          const { ...rest } = el;
 
           // Calculate absolute position and rotation
           const angleRad = group.rotation * Math.PI / 180; // Group's rotation

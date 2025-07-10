@@ -460,11 +460,7 @@ const ElementRenderer = ({
           fillLinearGradientColorStops: element.fillLinearGradientColorStops,
           fillLinearGradientStartPoint: element.fillLinearGradientStartPoint,
           fillLinearGradientEndPoint: element.fillLinearGradientEndPoint,
-          fillRadialGradientColorStops: element.fillRadialGradientColorStops,
-          fillRadialGradientStartPoint: element.fillRadialGradientStartPoint,
-          fillRadialGradientEndPoint: element.fillRadialGradientEndPoint,
-          fillRadialGradientStartRadius: element.fillRadialGradientStartRadius,
-          fillRadialGradientEndRadius: element.fillRadialGradientEndRadius,
+          
           _version: element._version,
         }}
         onSelect={onSelect}
