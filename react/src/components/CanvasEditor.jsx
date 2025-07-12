@@ -41,7 +41,7 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
       "elements",
       JSON.stringify(elements?.filter((a) => Object.keys(a).length > 0))
     );
-    formdata.append("category", templateObj.category);
+    formdata.append("category", templateObj.category || "regular");
     formdata.append("state", templateObj.state || "draft");
     mutate({
       payload: formdata
@@ -57,7 +57,8 @@ const CanvasEditor = ({ template, mode = "edit" }) => {
     formdata.append("name", templateObj.name);
     formdata.append("frame", file);
     formdata.append("elements", JSON.stringify(elements));
-    formdata.append("category", templateObj.category);
+    formdata.append("category", templateObj.category || "regular");
+    formdata.append("state", templateObj.state || "draft");
     mutate({
       payload: formdata,
       id: template._id
