@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from api.serializers.subcategory import SubCategorySerializer
 from ..models.user import User, CompanyDetails, Product, Political, Supporters, Party
 from ..serializers.license import LicenseSerializer
 from ..serializers.subscription import SubscriptionSerializer
@@ -39,6 +41,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
     company_details = CompanyDetailsSerializer()
     political = PoliticalSerializer()
     products = ProductSerializer(many=True)
+    business_category = SubCategorySerializer(many=True)
+    language = SubCategorySerializer(many=True)
 
     class Meta:
         model = User
