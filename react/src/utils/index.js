@@ -134,8 +134,8 @@ export const getFill = (element) => {
 
 export const roundProps = (obj, propsToRound) => {
   const newObj = { ...obj };
-  propsToRound.forEach(prop => {
-    if (typeof newObj[prop] === 'number') {
+  propsToRound.forEach((prop) => {
+    if (typeof newObj[prop] === "number") {
       newObj[prop] = Math.round(newObj[prop]);
     }
   });

@@ -2,6 +2,9 @@ from django.contrib import messages
 from django.urls import path
 from django.contrib import admin
 from django.shortcuts import get_object_or_404, redirect
+
+from api.models.category import Category
+from api.models.subcategory import SubCategory
 from .models import User, Subscription, License, Distributor, MasterDistributor, Order, OrderSubscription, CompanyDetails, Product, Political, Supporters, Party
 import nested_admin
 
@@ -30,13 +33,44 @@ class PoliticalInline(nested_admin.NestedStackedInline):
     exclude = ['image']  # hides the field from the form
     inlines = [PartyInline, SupportersInline]
 
+
+# forms.py
+from django import forms
+from .models import User, Category, SubCategory
+
+class UserAdminForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # For business_category field
+        business_parent = Category.objects.filter(name='Business Category').first()
+        if 'business_category' in self.fields:
+            if business_parent:
+                self.fields['business_category'].queryset = SubCategory.objects.filter(category=business_parent)
+            else:
+                self.fields['business_category'].queryset = SubCategory.objects.none()
+
+        # For language field
+        language_parent = Category.objects.filter(name='Language').first()
+        if 'language' in self.fields:
+            if language_parent:
+                self.fields['language'].queryset = SubCategory.objects.filter(category=language_parent)
+            else:
+                self.fields['language'].queryset = SubCategory.objects.none()
+
 @admin.register(User)
 class UserAdmin(nested_admin.NestedModelAdmin):
+    form = UserAdminForm 
     list_display = ('first_name', 'last_name', 'email', 'mobile_number', 'is_verified', 'date_joined')
     search_fields = ('email', 'mobile_number', 'first_name', 'last_name')
     list_filter = ('is_verified', 'date_joined')
     inlines = [CompanyDetailsInline, ProductInline, PoliticalInline]
-
+    
+    
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('name', 'price', 'duration_days', 'created_at', 'updated_at')

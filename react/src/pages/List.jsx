@@ -95,6 +95,7 @@ function ListPage() {
                         <tr>
                             <th>Template Name</th>
                             <th>Category</th>
+                            <th>Status</th>
                             <th>Created At</th>
                             <th>Updated At</th>
                             <th>Actions</th>
@@ -106,6 +107,7 @@ function ListPage() {
                                 <tr key={template._id} className='template-row'>
                                     <td>{template.name}</td>
                                     <td className='category'>{template.category}</td>
+                                    <td className='category'>{template.state}</td>
                                     <td>{format(new Date(template.createdAt), 'MMM dd yyyy, hh:mm a')}</td>
                                     <td>{format(new Date(template.updatedAt), 'MMM dd yyyy, hh:mm a')}</td>
                                     <td>

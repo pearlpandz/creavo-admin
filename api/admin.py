@@ -45,7 +45,7 @@ class CategoryAdminConfig(admin.ModelAdmin):
 
 @admin.register(Media)
 class MediaAdminConfig(admin.ModelAdmin):
-    list_display = ('image_tag', 'title',)
+    list_display = ('image_tag', 'title', 'rating')
     filter_horizontal = ('categories', 'subcategories')  # Nice UI for multi-select
     exclude = ['image', 'thumbnail']  # hides the field from the form
     list_per_page = 15
