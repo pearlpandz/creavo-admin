@@ -10,23 +10,29 @@ def authenticate_and_get_user(request, model):
     jwt_auth = JWTAuthentication()
     try:
         token = request.COOKIES.get('access_token') or request.headers.get('Authorization', '').split('Bearer ')[-1]
-
+        print('token:', token)
         if not token:
             raise AuthenticationFailed("Token not found in cookies.")
 
         try:
             validated_token = jwt_auth.get_validated_token(token)
+            print('validated_token:', validated_token)
         except Exception:
             raise AuthenticationFailed("Invalid token.")
 
         user_id = validated_token.payload['user_id']
+        print('user_id:', user_id)
         user = model.objects.filter(id=user_id).first()
+        print('user:', user)
 
         if not user:
+            print("User not found or invalid token.")
             raise AuthenticationFailed("User not found or invalid token.")
 
-        if hasattr(user, 'is_verified') and not user.is_verified:
-            raise AuthenticationFailed("User is not verified.")
+        # we should allow the unauthorised users to access the application similar to unsubscribed user
+        # if hasattr(user, 'is_verified') and not user.is_verified:
+        #     print("User is not verified.")
+        #     raise AuthenticationFailed("User is not verified.")
 
         return user
     except Exception:
@@ -36,6 +42,7 @@ class IsAuthenticated(BasePermission):
     def has_permission(self, request, view):
         user = authenticate_and_get_user(request, Distributor)
         if user is not None and isinstance(user, Distributor):
+            print('authorized as distributor')
             return True
 
         user = authenticate_and_get_user(request, MasterDistributor)
@@ -44,7 +51,10 @@ class IsAuthenticated(BasePermission):
             return True
         
         user = authenticate_and_get_user(request, User)
+        print("user", user)
         if user is not None and isinstance(user, User):
+            print('authorized as user')
             return True
-        
+        print("isinstance(user, User)", isinstance(user, User))
+        print('authorization failed')
         return False

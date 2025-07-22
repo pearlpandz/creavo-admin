@@ -8,7 +8,7 @@ from accounts.permissions import IsAuthenticated
 from accounts.serializers.license import LicenseSerializer
 from accounts.serializers.user import UserDetailSerializer
 from accounts.utils import get_user_from_access_token
-from api.serializers.category import CategorySerializer
+from api.serializers.category import BaseCategorySerializer, CategorySerializer
 from api.serializers.subcategory import SubCategorySerializer
 from api.models.category import Category
 from drf_spectacular.utils import extend_schema, OpenApiParameter # type: ignore
@@ -19,6 +19,17 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action == 'signup_list':
+            return BaseCategorySerializer
+        return super().get_serializer_class()
+    
+    @action(detail=False, methods=["get"], url_path="signup-list")
+    def signup_list(self, request):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
     
     @extend_schema(
         parameters=[
@@ -39,8 +50,10 @@ class CategoryViewSet(viewsets.ModelViewSet):
         # extracting license details along with associated subscription details
         license = License.objects.filter(purchased_by=user).first()
         license_details = LicenseSerializer(license).data if license else None
-        subscription = license_details.get('subscription')
-        show_trending = subscription.get('show_trending', False)
+        show_trending = False
+        if license_details is not None:
+            subscription = license_details.get('subscription')
+            show_trending = subscription.get('show_trending', False)
 
         limit = int(request.GET.get('limit', 15))
         skip = int(request.GET.get('skip', 0))
@@ -85,13 +98,23 @@ class CategoryViewSet(viewsets.ModelViewSet):
         limit = int(request.GET.get('limit', 15))
         skip = int(request.GET.get('skip', 0))
         media_qs = category.media.all()
-
-        subscription = license_details.get('subscription', None)
-        enabled_ratings = subscription.get('enabled_ratings', [])
+        enabled_ratings = []
+        if license_details is not None:
+            subscription = license_details.get('subscription', None)
+            enabled_ratings = subscription.get('enabled_ratings', [])
 
         if subcategory_id and subcategory_id != 'all':
             media_qs = media_qs.filter(subcategories__id=subcategory_id)
-        
+        if subcategory_id and subcategory_id == 'all':
+            if "business" in category.name.lower():
+                ids = user.business_category.values_list("id", flat=True)
+                media_qs = media_qs.filter(subcategories__id__in=ids)
+            elif "language" in category.name.lower():
+                ids = user.language.values_list("id", flat=True)
+                media_qs = media_qs.filter(subcategories__id__in=ids)
+            else:
+                media_qs = media_qs.filter(subcategories__id=subcategory_id)
+
         if license_details is None:
             media_qs = media_qs.filter(rating__in=[5])
         else:

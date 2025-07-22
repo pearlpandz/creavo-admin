@@ -10,6 +10,12 @@ from api.models.subcategory import SubCategory
 from api.serializers.subcategory import SubCategorySerializer
 
 # This serializer used only for get categories along with its subcategory api
+class BaseCategorySerializer(serializers.ModelSerializer):
+    subcategories = SubCategorySerializer(many=True, read_only=True)
+    class Meta:
+        model = Category
+        fields = '__all__'
+
 class CategorySerializer(serializers.ModelSerializer):
     # subcategories = SubCategorySerializer(many=True, read_only=True)
     subcategories = serializers.SerializerMethodField()
