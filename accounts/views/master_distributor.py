@@ -19,12 +19,6 @@ class MasterDistributorViewSet(viewsets.ModelViewSet):
     queryset = MasterDistributor.objects.all()
     serializer_class = MasterDistributorSerializer
     permission_classes = [IsAuthenticated]
-
-    @action(detail=False, methods=['get'], url_path='verified')
-    def get_verified_distributors(self, request):
-        verified_distributors = self.queryset.filter(is_verified=True)
-        serializer = self.get_serializer(verified_distributors, many=True)
-        return Response(serializer.data)
     
     @action(detail=False, methods=['get'], url_path='users')
     def get_user_under_master_distributor(self, request):

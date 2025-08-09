@@ -29,11 +29,6 @@ def authenticate_and_get_user(request, model):
             print("User not found or invalid token.")
             raise AuthenticationFailed("User not found or invalid token.")
 
-        # we should allow the unauthorised users to access the application similar to unsubscribed user
-        # if hasattr(user, 'is_verified') and not user.is_verified:
-        #     print("User is not verified.")
-        #     raise AuthenticationFailed("User is not verified.")
-
         return user
     except Exception:
         return None

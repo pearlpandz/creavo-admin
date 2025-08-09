@@ -14,7 +14,6 @@ class User(models.Model):
     mobile_number = models.CharField(max_length=15, unique=True)
     password = models.CharField(max_length=128)
     date_joined = models.DateTimeField(auto_now_add=True)
-    is_verified = models.BooleanField(default=False)
     overall_downloads = models.PositiveIntegerField(default=0) # overall downloads
     day_downloads = models.PositiveIntegerField(default=0) # day downloads
     created_by_distributor = models.ForeignKey(Distributor, on_delete=models.SET_NULL, null=True, blank=True, related_name="users_created_by_distributor")

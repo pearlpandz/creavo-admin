@@ -20,9 +20,6 @@ def authenticate_user(request, user_model, user_type):
     if not user or not check_password(password, user.password):
         raise AuthenticationFailed(f"Invalid credentials for {user_type}.")
 
-    if not user.is_verified:
-        raise AuthenticationFailed(f"{user_type} account is not verified.")
-
     refresh = RefreshToken.for_user(user)
 
     response = Response({
