@@ -14,7 +14,6 @@ class User(models.Model):
     mobile_number = models.CharField(max_length=15, unique=True)
     password = models.CharField(max_length=128)
     date_joined = models.DateTimeField(auto_now_add=True)
-    is_verified = models.BooleanField(default=False)
     overall_downloads = models.PositiveIntegerField(default=0) # overall downloads
     day_downloads = models.PositiveIntegerField(default=0) # day downloads
     created_by_distributor = models.ForeignKey(Distributor, on_delete=models.SET_NULL, null=True, blank=True, related_name="users_created_by_distributor")
@@ -22,8 +21,8 @@ class User(models.Model):
     license = models.CharField(max_length=100, blank=True)
     purchased_date = models.DateField(null=True, blank=True)
     last_login = models.DateTimeField(blank=True, null=True, default=None)
-    business_category = models.ManyToManyField(SubCategory, related_name='business_category')
-    language = models.ManyToManyField(SubCategory, related_name='languages')
+    business_category = models.ManyToManyField(SubCategory, related_name='business_category', blank=True)
+    language = models.ManyToManyField(SubCategory, related_name='languages', blank=True)
 
     def save(self, *args, **kwargs):
         if self.password and not self.password.startswith('pbkdf2_'):

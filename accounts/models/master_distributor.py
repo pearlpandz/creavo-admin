@@ -8,7 +8,6 @@ class MasterDistributor(models.Model):
     mobile_number = models.CharField(max_length=15, unique=True)
     password = models.CharField(max_length=128)
     created_at = models.DateTimeField(auto_now_add=True)
-    is_verified = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if self.password and not self.password.startswith('pbkdf2_'):

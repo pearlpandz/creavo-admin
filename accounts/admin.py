@@ -65,9 +65,9 @@ class UserAdminForm(forms.ModelForm):
 @admin.register(User)
 class UserAdmin(nested_admin.NestedModelAdmin):
     form = UserAdminForm 
-    list_display = ('first_name', 'last_name', 'email', 'mobile_number', 'is_verified', 'date_joined')
+    list_display = ('first_name', 'last_name', 'email', 'mobile_number', 'date_joined')
     search_fields = ('email', 'mobile_number', 'first_name', 'last_name')
-    list_filter = ('is_verified', 'date_joined')
+    list_filter = ['date_joined']
     inlines = [CompanyDetailsInline, ProductInline, PoliticalInline]
     
     

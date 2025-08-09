@@ -17,12 +17,6 @@ class DistributorViewSet(viewsets.ModelViewSet):
     queryset = Distributor.objects.select_related('created_by', 'verified_by').all()
     serializer_class = DistributorSerializer
     permission_classes = [IsAuthenticated]
-
-    @action(detail=False, methods=['get'], url_path='verified')
-    def get_verified_distributors(self, request):
-        verified_distributors = self.queryset.filter(is_verified=True)
-        serializer = self.get_serializer(verified_distributors, many=True)
-        return Response(serializer.data)
     
     @action(detail=False, methods=['get'], url_path='users')
     def get_user_under_distributor(self, request):

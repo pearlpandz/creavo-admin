@@ -8,7 +8,7 @@ from .views.user import UserSupportersViewSet, UserPoliticalViewSet, UserProduct
 from .views.subscription import SubscriptionViewSet
 from .views.license import LicenseViewSet, licenses_by_distributor, licenses_by_master_distributor
 from .views.license_generator import LicenseGeneratorAPIView
-from .views.authentication import UserAuthenticationAPIView, DistributorAuthenticationAPIView, MasterDistributorAuthenticationAPIView
+from .views.authentication import UserAuthenticationAPIView, DistributorAuthenticationAPIView, MasterDistributorAuthenticationAPIView, UserRegisterAPIView
 
 router = DefaultRouter()
 router.register(r'master-distributors', MasterDistributorViewSet, basename='master-distributor')
@@ -33,6 +33,7 @@ urlpatterns += router.urls
 
 urlpatterns += [
     path('auth/user/', UserAuthenticationAPIView.as_view(), name='user-authentication'),
+    path('auth/user/signup', UserRegisterAPIView.as_view(), name='user-signup'),
     path('auth/distributor/', DistributorAuthenticationAPIView.as_view(), name='distributor-authentication'),
     path('auth/master-distributor/', MasterDistributorAuthenticationAPIView.as_view(), name='master-distributor-authentication'),
 ]
