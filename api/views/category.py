@@ -94,6 +94,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         license_details = LicenseSerializer(license).data if license else None
 
         category = self.get_object()
+
         subcategory_id = request.GET.get('subcategoryid')
         limit = int(request.GET.get('limit', 15))
         skip = int(request.GET.get('skip', 0))
@@ -103,17 +104,22 @@ class CategoryViewSet(viewsets.ModelViewSet):
             subscription = license_details.get('subscription', None)
             enabled_ratings = subscription.get('enabled_ratings', [])
 
-        if subcategory_id and subcategory_id != 'all':
-            media_qs = media_qs.filter(subcategories__id=subcategory_id)
-        if subcategory_id and subcategory_id == 'all':
-            if "business" in category.name.lower():
+        # Only apply subcategory filter logic for 'business' or 'language' categories
+        if "business" in category.name.lower():
+            if subcategory_id and subcategory_id != 'all':
+                if str(subcategory_id).isdigit():
+                    media_qs = media_qs.filter(subcategories__id=int(subcategory_id))
+            elif subcategory_id == 'all':
                 ids = user.business_category.values_list("id", flat=True)
                 media_qs = media_qs.filter(subcategories__id__in=ids)
-            elif "language" in category.name.lower():
+        elif "language" in category.name.lower():
+            if subcategory_id and subcategory_id != 'all':
+                if str(subcategory_id).isdigit():
+                    media_qs = media_qs.filter(subcategories__id=int(subcategory_id))
+            elif subcategory_id == 'all':
                 ids = user.language.values_list("id", flat=True)
                 media_qs = media_qs.filter(subcategories__id__in=ids)
-            else:
-                media_qs = media_qs.filter(subcategories__id=subcategory_id)
+        # For other categories, do not filter by subcategory at all (always return all media)
 
         if license_details is None:
             media_qs = media_qs.filter(rating__in=[5])
