@@ -57,7 +57,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
         limit = int(request.GET.get('limit', 15))
         skip = int(request.GET.get('skip', 0))
-        queryset = Category.objects.all()
+        queryset = Category.objects.all().order_by('order', 'name')
 
         if not show_trending:
             queryset = queryset.exclude(name__iexact='trending')
@@ -99,6 +99,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
         limit = int(request.GET.get('limit', 15))
         skip = int(request.GET.get('skip', 0))
         media_qs = category.media.all()
+        if subcategory_id != 'all' and subcategory_id != None:
+            media_qs = category.media.filter(subcategories__id=int(subcategory_id))
         enabled_ratings = []
         if license_details is not None:
             subscription = license_details.get('subscription', None)
