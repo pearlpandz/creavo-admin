@@ -25,6 +25,31 @@ python manage.py runserver
 How to start the local server
 > .django\Scripts\activate
 > python manage.py runserver
+> python -m debugpy --listen 5678 manage.py runserver 127.0.0.1:8000
+
+```json
+// launch.json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach to Django (debugpy)",
+      "type": "python",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 5678
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}",
+          "remoteRoot": "${workspaceFolder}"
+        }
+      ]
+    }
+  ]
+}
+```
 
 Clear old migrations for new setup
 find . -path "*/migrations/*.py" -not -name "__init__.py" -delete

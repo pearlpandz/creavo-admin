@@ -133,6 +133,7 @@ const ImageBasedShape = forwardRef((props, ref) => {
     <KonvaImage
       ref={ref}
       {...shapeProps}
+      fill={'transparent'}
       image={shapeProps.type === "video" ? videoRef.current : image}
       onClick={(e) => {
         if (mode === "edit") {
