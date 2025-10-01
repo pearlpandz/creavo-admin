@@ -76,6 +76,7 @@ function KonvaBuilder(props) {
     } else if (type === "image") {
       newElement = {
         ...baseProps,
+        strokeWidth: 0,
         src: "https://frame-service.creavo.in/uploads/placeholder-image.jpg",
         width: 150,
         height: 150,

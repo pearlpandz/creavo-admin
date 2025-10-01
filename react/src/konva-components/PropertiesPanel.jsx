@@ -446,20 +446,22 @@ const PropertiesPanel = ({
               </div>
             </>
           )}
-          <div style={rowStyle}>
-            <span style={labelStyle}>FILL TYPE</span>
-            <select
-              name="fillType"
-              value={selectedElement.fillType || "solid"}
-              onChange={handleChange}
-              style={{ ...inputStyle, width: "120px" }}
-            >
-              <option value="solid">Solid</option>
-              <option value="linear-gradient">Linear Gradient</option>
-              
-            </select>
-          </div>
-          {(selectedElement.fillType === "solid" || !selectedElement.fillType) && (
+          {selectedElement.type !== "image" && (
+            <div style={rowStyle}>
+              <span style={labelStyle}>FILL TYPE</span>
+              <select
+                name="fillType"
+                value={selectedElement.fillType || "solid"}
+                onChange={handleChange}
+                style={{ ...inputStyle, width: "120px" }}
+              >
+                <option value="solid">Solid</option>
+                <option value="linear-gradient">Linear Gradient</option>
+
+              </select>
+            </div>
+          )}
+          {(selectedElement.fillType === "solid" || !selectedElement.fillType) && selectedElement.type !== "image" && (
             <div style={rowStyle}>
               <span style={labelStyle}>FILL COLOR</span>
               <input
@@ -469,7 +471,7 @@ const PropertiesPanel = ({
               />
             </div>
           )}
-          {selectedElement.fillType === "linear-gradient" && (
+          {selectedElement.fillType === "linear-gradient" && selectedElement.type !== "image" && (
             <>
               <div style={rowStyle}>
                 <span style={labelStyle}>GRADIENT COLOR 1</span>
@@ -539,33 +541,36 @@ const PropertiesPanel = ({
                   <option value="bottom-to-top">Bottom to Top</option>
                 </select>
               </div>
-              
+
             </>
           )}
-          
-          <div style={rowStyle}>
-            <span style={labelStyle}>STROKE</span>
-            <input
-              type="color"
-              value={selectedElement.stroke}
-              onChange={(e) => handleColorChange(e.target.value, "stroke")}
-            />
-            <input
-              type="number"
-              name="strokeWidth"
-              value={selectedElement.strokeWidth}
-              onChange={handleChange}
-              style={inputStyle}
-            />
-          </div>
-          <div style={rowStyle}>
-            <span style={labelStyle}>COLOR</span>
-            <input
-              type="color"
-              value={selectedElement.color}
-              onChange={(e) => handleColorChange(e.target.value, "color")}
-            />
-          </div>
+          {selectedElement.type !== "image" && (
+            <div style={rowStyle}>
+              <span style={labelStyle}>STROKE</span>
+              <input
+                type="color"
+                value={selectedElement.stroke}
+                onChange={(e) => handleColorChange(e.target.value, "stroke")}
+              />
+              <input
+                type="number"
+                name="strokeWidth"
+                value={selectedElement.strokeWidth}
+                onChange={handleChange}
+                style={inputStyle}
+              />
+            </div>
+          )}
+          {selectedElement.type !== "image" && (
+            <div style={rowStyle}>
+              <span style={labelStyle}>COLOR</span>
+              <input
+                type="color"
+                value={selectedElement.color}
+                onChange={(e) => handleColorChange(e.target.value, "color")}
+              />
+            </div>
+          )}
           {(selectedElement.type === "rect" ||
             selectedElement.type === "square") && (
               <>
