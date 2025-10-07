@@ -23,11 +23,10 @@ packaging==25.0
 psycopg2-binary==2.9.10
 PyJWT==2.9.0
 python-monkey-business==1.1.0
-<<<<<<< HEAD
-=======
+pywin32
+
 pywin32==
 pywinpty==2.0.15
->>>>>>> 6009795 (Update requirements.txt)
 PyYAML==6.0.2
 referencing==0.36.2
 requests==2.32.3
