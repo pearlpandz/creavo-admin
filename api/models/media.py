@@ -1,5 +1,5 @@
 import os
-import requests
+# import requests
 from django.conf import settings
 from django.db import models
 from .category import Category
@@ -20,4 +20,7 @@ class Media(models.Model):
 
     def __str__(self):
         return self.image
+    
+    def is_gif(self):
+        return self.media.name.lower().endswith('.gif')
     

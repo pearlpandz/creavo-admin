@@ -23,6 +23,24 @@ class SubCategoryInline(admin.StackedInline):
     model = SubCategory
     extra = 0
 
+class MediaInline(admin.StackedInline):
+    model = Media
+    extra = 0
+    filter_horizontal = ('categories', 'subcategories')
+    fields = ('title', 'media', 'image', 'short_description', 'rating', 'categories', 'subcategories', 'image_tag')
+    readonly_fields = ('image_tag',)
+
+    def image_tag(self, obj):
+        if obj.thumbnail:
+            return format_html(
+                '<img src="{}" width="60" height="60" style="object-fit:cover;border-radius:4px;" />',
+                obj.thumbnail
+            )
+        return "-"
+    image_tag.short_description = 'Image'
+
+
+
 @admin.register(Category)
 class CategoryAdminConfig(admin.ModelAdmin):
     exclude = []
@@ -42,6 +60,15 @@ class CategoryAdminConfig(admin.ModelAdmin):
         return ", ".join(subcat.name for subcat in subcats)
     
     subcategories_list.short_description = "Subcategories"
+    inlines = [SubCategoryInline]
+
+@admin.register(SubCategory)
+class SubCategoryAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'category']
+    search_fields = ['name']
+    list_filter = ['category']
+    ordering = ['category', 'name']
+    # inlines = [MediaInline]
 
 @admin.register(Media)
 class MediaAdminConfig(admin.ModelAdmin):
@@ -50,12 +77,33 @@ class MediaAdminConfig(admin.ModelAdmin):
     exclude = ['image', 'thumbnail']  # hides the field from the form
     list_per_page = 15
 
-    def image_tag(self, obj):
-        if obj.thumbnail:
-            return format_html('<img src="{}" width="60" height="60" style="object-fit:cover;border-radius:4px;" />', obj.thumbnail)
-        return "-"
+    # def image_tag(self, obj):
+    #     if obj.thumbnail:
+    #         return format_html('<img src="{}" width="60" height="60" style="object-fit:cover;border-radius:4px;" />', obj.thumbnail)
+    #     return "-"
     
-    image_tag.short_description = 'Image'
+    # image_tag.short_description = 'Image'
+
+    def image_tag(self, obj):
+        if obj.media:  # <-- changed from obj.thumbnail
+            ext = obj.media.name.split('.')[-1].lower()
+            if ext in ['jpg', 'jpeg', 'png', 'gif']:
+                # For images and GIFs
+                return format_html(
+                    '<img src="{}" width="60" height="60" style="object-fit:cover;border-radius:4px;" />',
+                    obj.media.url
+                )
+            elif ext in ['mp4', 'mov']:
+                # For videos
+                return format_html(
+                    '<video width="60" height="60" controls>'
+                    '<source src="{}" type="video/{}">'
+                    '</video>',
+                    obj.media.url, ext
+                )
+        return "-"
+
+    image_tag.short_description = 'Media'
 
     def delete_queryset(self, request, queryset):
         print("Call delete() on each object to trigger Node.js cleanup")
