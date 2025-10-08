@@ -8,6 +8,7 @@ from accounts.utils import get_user_from_access_token
 from api.models.category import Category
 from api.models.subcategory import SubCategory
 from api.serializers.subcategory import SubCategorySerializer
+from api.models.media import Media
 
 # This serializer used only for get categories along with its subcategory api
 class BaseCategorySerializer(serializers.ModelSerializer):
@@ -19,6 +20,7 @@ class BaseCategorySerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     # subcategories = SubCategorySerializer(many=True, read_only=True)
     subcategories = serializers.SerializerMethodField()
+    media = serializers.SerializerMethodField()
 
     class Meta:
         model = Category
@@ -59,5 +61,20 @@ class CategorySerializer(serializers.ModelSerializer):
             many=True,
             context=self.context
         ).data
+    def create(self, validated_data):
+        media_data = validated_data.pop('media', [])
+        category = Category.objects.create(**validated_data)
+        for media_item in media_data:
+            Media.objects.create(categories=[category], **media_item)
+        return category
+
+    def update(self, instance, validated_data):
+        media_data = validated_data.pop('media', [])
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        for media_item in media_data:
+            Media.objects.create(categories=[instance], **media_item)
+        return instance
 
 

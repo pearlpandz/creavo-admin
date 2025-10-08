@@ -17,6 +17,21 @@ class MediaViewSet(viewsets.ModelViewSet):
     serializer_class = MediaSerializer
     permission_classes = [IsAuthenticated]
 
+    def create(self, request, *args, **kwargs):
+        """
+        Handle media upload and link to categories/subcategories
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+
+        # Auto-set image URL if media file is uploaded
+        if instance.media:
+            instance.image = request.build_absolute_uri(instance.media.url)
+            instance.save()
+
+        return Response(serializer.data)
+
     @action(detail=False, methods=['get'], url_path='grouped', url_name='grouped')
     def grouped(self, request):
 
