@@ -42,7 +42,7 @@ class MediaInline(admin.StackedInline):
 @admin.register(Category)
 class CategoryAdminConfig(admin.ModelAdmin):
     exclude = []
-    list_display = ['id','name', 'subcategories_list', 'order']
+    list_display = ['id','name', 'subcategories_list', 'media_count',  'order']
     search_fields=['name']
     list_filter=['name']
     # actions=[make_inactive,make_active]
@@ -58,15 +58,25 @@ class CategoryAdminConfig(admin.ModelAdmin):
         return ", ".join(subcat.name for subcat in subcats)
     
     subcategories_list.short_description = "Subcategories"
+
+    def media_count(self, obj):
+        # Count all Media linked to this category 
+        return obj.media.count()
+    media_count.short_description = "Media Count"
     
 
 @admin.register(SubCategory)
 class SubCategoryAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'category']
+    list_display = ['id', 'name', 'category', 'media_count']
     search_fields = ['name']
     list_filter = ['category']
     ordering = ['category', 'name']
     inlines = [MediaInline]
+
+    def media_count(self, obj):
+        # Count all Media linked to this subcategory 
+        return obj.media.count()
+    media_count.short_description = "Media Count"
     
 # ✅ Inline for Category (link existing media)
 class CategoryMediaInline(admin.TabularInline):

@@ -6,8 +6,10 @@ from api.models.media import Media
 # This serializer used only for get list of subcategory under category api
 class SubCategorySerializer(serializers.ModelSerializer):
     media = serializers.SerializerMethodField()
+    media_count = serializers.SerializerMethodField()
     class Meta:
         model = SubCategory
+        fields = ['id', 'name', 'description','media_count']
         exclude = ['category']
 
     def create(self, validated_data):

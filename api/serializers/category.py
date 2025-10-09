@@ -21,10 +21,15 @@ class CategorySerializer(serializers.ModelSerializer):
     # subcategories = SubCategorySerializer(many=True, read_only=True)
     subcategories = serializers.SerializerMethodField()
     media = serializers.SerializerMethodField()
+    media_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ['id', 'name', 'description', 'order', 'subcategories', 'bg_color','media_count']
+
+    def get_media_count(self, obj):
+        # Count all media linked to this category
+        return obj.media.count()
 
     def get_subcategories(self, category) -> List[SubCategorySerializer]:
         request = self.context.get('request')
