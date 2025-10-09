@@ -11,6 +11,7 @@ from accounts.utils import get_user_from_access_token
 from api.serializers.category import BaseCategorySerializer, CategorySerializer
 from api.serializers.subcategory import SubCategorySerializer
 from api.models.category import Category
+from api.models.subcategory import SubCategory
 from drf_spectacular.utils import extend_schema, OpenApiParameter # type: ignore
 from api.serializers.media import GetMediaSerializer
 
@@ -57,7 +58,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
         limit = int(request.GET.get('limit', 15))
         skip = int(request.GET.get('skip', 0))
-        queryset = Category.objects.all().order_by('order', 'name')
+        queryset = Category.objects.filter(is_active=True).order_by('order', 'name')
 
         if not show_trending:
             queryset = queryset.exclude(name__iexact='trending')
@@ -142,7 +143,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
     
 @extend_schema(tags=['Subcateogry'])
 class SubCategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
+    # queryset = Category.objects.all()
+    queryset =  SubCategory.objects.filter(is_active=True)
     serializer_class = SubCategorySerializer
     permission_classes = [IsAuthenticated]
     

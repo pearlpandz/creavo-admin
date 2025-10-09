@@ -42,7 +42,7 @@ class MediaInline(admin.StackedInline):
 @admin.register(Category)
 class CategoryAdminConfig(admin.ModelAdmin):
     exclude = []
-    list_display = ['id','name', 'subcategories_list', 'media_count',  'order']
+    list_display = ['id','name', 'subcategories_list', 'media_count',  'is_active', 'order']
     search_fields=['name']
     list_filter=['name']
     # actions=[make_inactive,make_active]
@@ -67,7 +67,7 @@ class CategoryAdminConfig(admin.ModelAdmin):
 
 @admin.register(SubCategory)
 class SubCategoryAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'category', 'media_count']
+    list_display = ['id', 'name', 'category', 'media_count' ,'is_active']
     search_fields = ['name']
     list_filter = ['category']
     ordering = ['category', 'name']
