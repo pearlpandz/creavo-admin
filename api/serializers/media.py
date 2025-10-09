@@ -8,8 +8,9 @@ class MediaSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(), many=True, required=False
     )
     subcategories = serializers.PrimaryKeyRelatedField(
-        queryset=SubCategory.objects.all(), many=True, required=False
+         queryset=SubCategory.objects.all(), required=False, allow_null=True
     )
+
     class Meta:
         model = Media
         fields = '__all__'

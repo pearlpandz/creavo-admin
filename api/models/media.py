@@ -9,11 +9,11 @@ class Media(models.Model):
     media = models.FileField(upload_to='', default=None)
     image = models.URLField(max_length=200, null=True)
     thumbnail = models.URLField(max_length=200, null=True)
-    media_type = models.CharField(max_length=50,default=None, choices=[('image', 'Image (png, jpg, webp, gif)'), ('video', 'Video')])
+    media_type = models.CharField(max_length=50,default='image', choices=[('image', 'Image (png, jpg, webp, gif)'), ('video', 'Video')])
     title = models.CharField(max_length=100, null=True)
     short_description = models.TextField(null=True, blank=True, default=None)
     categories = models.ManyToManyField(Category, related_name='media', blank=True)
-    subcategories = models.ManyToManyField(SubCategory, related_name='media', blank=True)
+    subcategories = models.ForeignKey(SubCategory,on_delete=models.CASCADE, related_name='media', blank=True, null=True)
     rating = models.CharField(max_length=10, default=5, choices=[('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5')])
 
     REQUIRED_FIELDS = ['media', 'media_type', 'title', 'categories']

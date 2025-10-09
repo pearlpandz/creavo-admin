@@ -25,8 +25,8 @@ class SubCategoryInline(admin.StackedInline):
 
 class MediaInline(admin.StackedInline):
     model = Media
-    extra = 0
-    filter_horizontal = ('categories', 'subcategories')
+    extra = 1
+    # filter_horizontal = ('categories', 'subcategories')
     fields = ('title', 'media', 'image', 'short_description', 'rating', 'categories', 'subcategories', 'image_tag')
     readonly_fields = ('image_tag',)
 
@@ -66,12 +66,19 @@ class SubCategoryAdmin(admin.ModelAdmin):
     search_fields = ['name']
     list_filter = ['category']
     ordering = ['category', 'name']
+    inlines = [MediaInline]
     
+# ✅ Inline for Category (link existing media)
+class CategoryMediaInline(admin.TabularInline):
+    model = Media.categories.through
+    extra = 1
+    verbose_name = "Media"
+    verbose_name_plural = "Media"
 
 @admin.register(Media)
 class MediaAdminConfig(admin.ModelAdmin):
     list_display = ('image_tag', 'title', 'rating')
-    filter_horizontal = ('categories', 'subcategories')  # Nice UI for multi-select
+    filter_horizontal = ('categories',)  # Nice UI for multi-select
     exclude = ['image', 'thumbnail']  # hides the field from the form
     list_per_page = 15
 
