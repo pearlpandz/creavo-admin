@@ -23,10 +23,26 @@ class SubCategoryInline(admin.StackedInline):
     model = SubCategory
     extra = 0
 
+class MediaInline(admin.StackedInline):
+    model = Media
+    extra = 1
+    # filter_horizontal = ('categories', 'subcategories')
+    fields = ('title', 'media', 'image', 'short_description', 'rating', 'categories', 'subcategories', 'image_tag')
+    readonly_fields = ('image_tag',)
+
+    def image_tag(self, obj):
+        if obj.thumbnail:
+            return format_html(
+                '<img src="{}" width="60" height="60" style="object-fit:cover;border-radius:4px;" />',
+                obj.thumbnail
+            )
+        return "-"
+    image_tag.short_description = 'Image'
+
 @admin.register(Category)
 class CategoryAdminConfig(admin.ModelAdmin):
     exclude = []
-    list_display = ['id','name', 'subcategories_list', 'order']
+    list_display = ['id','name', 'subcategories_list', 'media_count',  'is_active', 'order']
     search_fields=['name']
     list_filter=['name']
     # actions=[make_inactive,make_active]
@@ -43,19 +59,66 @@ class CategoryAdminConfig(admin.ModelAdmin):
     
     subcategories_list.short_description = "Subcategories"
 
+    def media_count(self, obj):
+        # Count all Media linked to this category 
+        return obj.media.count()
+    media_count.short_description = "Media Count"
+    
+
+@admin.register(SubCategory)
+class SubCategoryAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'category', 'media_count' ,'is_active']
+    search_fields = ['name']
+    list_filter = ['category']
+    ordering = ['category', 'name']
+    inlines = [MediaInline]
+
+    def media_count(self, obj):
+        # Count all Media linked to this subcategory 
+        return obj.media.count()
+    media_count.short_description = "Media Count"
+    
+# ✅ Inline for Category (link existing media)
+class CategoryMediaInline(admin.TabularInline):
+    model = Media.categories.through
+    extra = 1
+    verbose_name = "Media"
+    verbose_name_plural = "Media"
+
 @admin.register(Media)
 class MediaAdminConfig(admin.ModelAdmin):
     list_display = ('image_tag', 'title', 'rating')
-    filter_horizontal = ('categories', 'subcategories')  # Nice UI for multi-select
+    filter_horizontal = ('categories',)  # Nice UI for multi-select
     exclude = ['image', 'thumbnail']  # hides the field from the form
     list_per_page = 15
 
-    def image_tag(self, obj):
-        if obj.thumbnail:
-            return format_html('<img src="{}" width="60" height="60" style="object-fit:cover;border-radius:4px;" />', obj.thumbnail)
-        return "-"
+    # def image_tag(self, obj):
+    #     if obj.thumbnail:
+    #         return format_html('<img src="{}" width="60" height="60" style="object-fit:cover;border-radius:4px;" />', obj.thumbnail)
+    #     return "-"
     
-    image_tag.short_description = 'Image'
+    # image_tag.short_description = 'Image'
+
+    def image_tag(self, obj):
+        if obj.media:  # <-- changed from obj.thumbnail
+            ext = obj.media.name.split('.')[-1].lower()
+            if ext in ['jpg', 'jpeg', 'png', 'gif']:
+                # For images and GIFs
+                return format_html(
+                    '<img src="{}" width="60" height="60" style="object-fit:cover;border-radius:4px;" />',
+                    obj.media.url
+                )
+            elif ext in ['mp4', 'mov']:
+                # For videos
+                return format_html(
+                    '<video width="60" height="60" controls>'
+                    '<source src="{}" type="video/{}">'
+                    '</video>',
+                    obj.media.url, ext
+                )
+        return "-"
+
+    image_tag.short_description = 'Media'
 
     def delete_queryset(self, request, queryset):
         print("Call delete() on each object to trigger Node.js cleanup")
