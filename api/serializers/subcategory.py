@@ -9,8 +9,8 @@ class SubCategorySerializer(serializers.ModelSerializer):
     media_count = serializers.SerializerMethodField()
     class Meta:
         model = SubCategory
-        fields = ['id', 'name', 'description','media_count']
-        exclude = ['category']
+        fields = ['id', 'name', 'description','media_count','category']
+        # exclude = ['category']
 
     def get_media_count(self, obj):
         return obj.media.count()
