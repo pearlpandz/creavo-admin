@@ -154,7 +154,7 @@ class EventMediaInline(admin.StackedInline):
 @admin.register(Event)
 class EventAdminConfig(admin.ModelAdmin):
     exclude = []
-    list_display = ['name', 'date']
+    list_display = ['name', 'date', 'media_count']
     search_fields=['name']
     list_filter=['name']
     # actions=[make_inactive,make_active]
@@ -162,6 +162,11 @@ class EventAdminConfig(admin.ModelAdmin):
     sortable_by=['name', 'date']
     ordering = ['date']
     inlines = [EventMediaInline]
+
+    def media_count(self, obj):
+        return obj.events.count()
+
+    media_count.short_description = "Media Count"
 
 
 @staff_member_required
