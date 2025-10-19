@@ -1,4 +1,7 @@
 from rest_framework import serializers
+from .models import Blog
+
+
 from .models import (ContactInquiry, NewsletterSubscriber, MediaLibrary,
                      PageSection, Project, Service, ServiceFeature,
                      Template, TemplateCategory, Testimonial, SiteSetting)
@@ -63,3 +66,9 @@ class SiteSettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = SiteSetting
         fields = ['setting_key','setting_value','setting_type']
+
+
+class BlogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Blog
+        fields = ['id', 'title', 'slug', 'short_description', 'content', 'feature_image', 'author_name', 'published_at']

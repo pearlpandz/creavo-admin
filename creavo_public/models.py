@@ -106,3 +106,17 @@ class SiteSetting(models.Model):
     setting_key = models.CharField(max_length=255, unique=True)
     setting_value = models.TextField()
     setting_type = models.CharField(max_length=50, default='text')
+
+
+class Blog(models.Model):
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=250, unique=True, blank=True)
+    short_description = models.TextField(blank=True, null=True)
+    content = models.TextField()
+    feature_image = models.ImageField(upload_to='blog_images/', blank=True, null=True)
+    author_name = models.CharField(max_length=100, default='Admin')
+    published_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_featured = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    views = models.PositiveIntegerField(default=0)
