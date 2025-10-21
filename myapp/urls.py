@@ -8,6 +8,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView # t
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('creavo_public/', include('creavo_public.urls')),
     path('api/', include('api.urls')),
     path('accounts/', include('accounts.urls')),
     path('frames/', include('frames.urls')),

@@ -9,8 +9,12 @@ class EventMediaSerializer(serializers.ModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
     images = EventMediaSerializer(source='events', many=True, read_only=True)
+    media_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Event
-        fields = ['id', 'name', 'date', 'images']
+        fields = ['id', 'name', 'date', 'images', 'media_count']
+
+    def get_media_count(self, obj):
+        return obj.events.count()
 

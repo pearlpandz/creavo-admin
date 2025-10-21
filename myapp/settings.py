@@ -67,7 +67,8 @@ INSTALLED_APPS = [
     'frames.apps.FramesConfig',
     'corsheaders',
     'drf_spectacular',
-    'nested_admin'
+    'nested_admin',
+    'creavo_public'
 ]
 
 MIDDLEWARE = [
@@ -80,6 +81,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'creavo_public.middleware.VerifyCreavoOriginMiddleware',
+
 ]
 
 ROOT_URLCONF = 'myapp.urls'
@@ -129,6 +132,13 @@ DATABASES = {
     }
 }
 
+REST_FRAMEWORK = {
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ]
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -165,17 +175,33 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 MEDIA_SERVER_URL = os.getenv('MEDIA_SERVER_URL', 'http://localhost:4001/upload')
 FRAME_SERVER_URL = os.getenv('FRAME_SERVER_URL', 'http://localhost:4000')
 
 CSRF_COOKIE_HTTPONLY = False  # Make cookie readable from JS
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_TRUSTED_ORIGINS = [
+    
     "https://*.creavo.in",
     "http://localhost:5173"
 ]
 
+CREAVO_PUBLIC = {
+    'ALLOWED_HOSTS_ORIGINS': ['creavo.in', '.creavo.in'],
+    
+    'DEV_LOCALHOST_PORTS': [8000, 3000, 5173],
+}
+
+
 REST_FRAMEWORK = {
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
