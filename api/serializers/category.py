@@ -9,6 +9,7 @@ from api.models.category import Category
 from api.models.subcategory import SubCategory
 from api.serializers.subcategory import SubCategorySerializer
 from api.models.media import Media
+from api.serializers.media import MediaSerializer,GetMediaSerializer
 
 # This serializer used only for get categories along with its subcategory api
 class BaseCategorySerializer(serializers.ModelSerializer):
@@ -25,7 +26,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['id', 'name', 'description', 'order', 'subcategories', 'bg_color','media_count']
+        fields = ['id', 'name', 'description', 'order', 'subcategories', 'bg_color','media_count','media']
 
     def get_media_count(self, obj):
         # Count all media linked to this category
@@ -66,6 +67,11 @@ class CategorySerializer(serializers.ModelSerializer):
             many=True,
             context=self.context
         ).data
+    
+    def get_media(self, obj):
+        media_qs = obj.media.all()  # ✅ use the instance, not the class
+        return GetMediaSerializer(media_qs, many=True, context=self.context).data
+
     def create(self, validated_data):
         media_data = validated_data.pop('media', [])
         category = Category.objects.create(**validated_data)

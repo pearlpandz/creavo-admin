@@ -87,7 +87,7 @@ class CategoryMediaInline(admin.TabularInline):
 
 @admin.register(Media)
 class MediaAdminConfig(admin.ModelAdmin):
-    list_display = ('image_tag', 'title', 'rating')
+    list_display = ('image_tag', 'title', 'rating','categories_list', 'subcategory_name')
     filter_horizontal = ('categories',)  # Nice UI for multi-select
     exclude = ['image', 'thumbnail']  # hides the field from the form
     list_per_page = 15
@@ -119,6 +119,13 @@ class MediaAdminConfig(admin.ModelAdmin):
         return "-"
 
     image_tag.short_description = 'Media'
+    def categories_list(self, obj):
+        return ", ".join([c.name for c in obj.categories.all()])
+    categories_list.short_description = "Categories"
+
+    def subcategory_name(self, obj):
+        return obj.subcategories.name if obj.subcategories else "-"
+    subcategory_name.short_description = "SubCategory"
 
     def delete_queryset(self, request, queryset):
         print("Call delete() on each object to trigger Node.js cleanup")
@@ -147,7 +154,7 @@ class EventMediaInline(admin.StackedInline):
 @admin.register(Event)
 class EventAdminConfig(admin.ModelAdmin):
     exclude = []
-    list_display = ['name', 'date']
+    list_display = ['name', 'date', 'media_count']
     search_fields=['name']
     list_filter=['name']
     # actions=[make_inactive,make_active]
@@ -155,6 +162,11 @@ class EventAdminConfig(admin.ModelAdmin):
     sortable_by=['name', 'date']
     ordering = ['date']
     inlines = [EventMediaInline]
+
+    def media_count(self, obj):
+        return obj.events.count()
+
+    media_count.short_description = "Media Count"
 
 
 @staff_member_required
