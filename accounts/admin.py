@@ -2,7 +2,8 @@ from django.contrib import messages
 from django.urls import path
 from django.contrib import admin
 from django.shortcuts import get_object_or_404, redirect
-
+from django.core.exceptions import ValidationError
+import re
 from api.models.category import Category
 from api.models.subcategory import SubCategory
 from .models import User, Subscription, License, Distributor, MasterDistributor, Order, OrderSubscription, CompanyDetails, Product, Political, Supporters, Party
@@ -11,6 +12,15 @@ import nested_admin
 class ProductInline(nested_admin.NestedTabularInline):
     model = Product
     extra = 0
+
+    def clean(self):
+        super().clean()
+        if any(self.errors):
+            return
+        total_forms = len([form for form in self.forms if not form.cleaned_data.get('DELETE', False)])
+        existing_count = Product.objects.filter(user=self.instance).count()
+        if total_forms + existing_count > 6:
+            raise ValidationError("A user can have a maximum of 6 products.")
 
 class CompanyDetailsInline(nested_admin.NestedStackedInline):
     model = CompanyDetails
@@ -42,6 +52,20 @@ class UserAdminForm(forms.ModelForm):
     class Meta:
         model = User
         fields = '__all__'
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+            raise ValidationError("Email already exists!")
+        return email
+
+    def clean_mobile_number(self):
+        mobile = self.cleaned_data.get('mobile_number')
+        if not re.fullmatch(r'^[6-9]\d{9}$', mobile):
+            raise ValidationError("Mobile number must be a valid 10-digit number.")
+        if User.objects.filter(mobile_number=mobile).exclude(pk=self.instance.pk).exists():
+            raise ValidationError("Mobile number already exists!")
+        return mobile
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
