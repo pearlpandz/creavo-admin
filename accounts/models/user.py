@@ -29,7 +29,19 @@ class User(models.Model):
             self.password = make_password(self.password)
         super().save(*args, **kwargs)
 
-    def __str__(self):
+        if self.license:
+            from accounts.models.license import License
+            try:
+                # If the license code exists, mark it as purchased
+                license_obj = License.objects.get(code=self.license)
+                if license_obj.status != 'purchased':
+                    license_obj.status = 'purchased'
+                    license_obj.purchased_by = self
+                    license_obj.save(update_fields=['status', 'purchased_by'])
+            except License.DoesNotExist:
+                pass
+
+    def __str__(self):                                                                                                                                                                                                                                                                                                                                                                                 
         return f"{self.first_name} {self.last_name}"
 
     def check_password(self, raw_password):

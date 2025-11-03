@@ -21,7 +21,7 @@ class ProductInline(nested_admin.NestedTabularInline):
         existing_count = Product.objects.filter(user=self.instance).count()
         if total_forms + existing_count > 6:
             raise ValidationError("A user can have a maximum of 6 products.")
-
+ 
 class CompanyDetailsInline(nested_admin.NestedStackedInline):
     model = CompanyDetails
     extra = 0
@@ -89,10 +89,41 @@ class UserAdminForm(forms.ModelForm):
 @admin.register(User)
 class UserAdmin(nested_admin.NestedModelAdmin):
     form = UserAdminForm 
-    list_display = ('first_name', 'last_name', 'email', 'mobile_number', 'date_joined')
+    list_display = ('first_name', 'last_name', 'email', 'mobile_number','subscription_plan', 'subscription_validity', 'date_joined')
     search_fields = ('email', 'mobile_number', 'first_name', 'last_name')
     list_filter = ['date_joined']
     inlines = [CompanyDetailsInline, ProductInline, PoliticalInline]
+
+    def subscription_plan(self, obj):
+        if obj.license:
+            license_obj = License.objects.filter(code=obj.license).first()
+            if license_obj and license_obj.subscription:
+                return license_obj.subscription.name
+        return '-'
+    subscription_plan.short_description = 'Subscription Plan'
+
+    def subscription_validity(self, obj):
+        if obj.license:
+            license_obj = License.objects.filter(code=obj.license).first()
+            if license_obj and license_obj.subscription:
+                return f"{license_obj.subscription.duration_days} days"
+        return '-'
+    subscription_validity.short_description = 'Validity'
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        # Ensure the License is marked as purchased when updated in admin
+        if obj.license:
+            from accounts.models.license import License
+            try:
+                license_obj = License.objects.get(code=obj.license)
+                if license_obj.status != 'purchased':
+                    license_obj.status = 'purchased'
+                    license_obj.purchased_by = obj
+                    license_obj.save(update_fields=['status', 'purchased_by'])
+            except License.DoesNotExist:
+                pass
+
     
     
 @admin.register(Subscription)
