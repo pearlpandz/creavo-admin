@@ -89,11 +89,13 @@ class UserAdminForm(forms.ModelForm):
 @admin.register(User)
 class UserAdmin(nested_admin.NestedModelAdmin):
     form = UserAdminForm 
-    list_display = ('first_name', 'last_name', 'email', 'mobile_number','subscription_plan', 'subscription_validity', 'date_joined')
+    list_display = ('first_name', 'last_name', 'email', 'mobile_number','subscription_plan', 'subscription_validity', 'free_subscription_days', 'coupon_code','date_joined')
     search_fields = ('email', 'mobile_number', 'first_name', 'last_name')
     list_filter = ['date_joined']
     inlines = [CompanyDetailsInline, ProductInline, PoliticalInline]
-
+    list_editable = ('free_subscription_days', 'coupon_code')
+    list_per_page = 25  # pagination
+    list_max_show_all = 200
     def subscription_plan(self, obj):
         if obj.license:
             license_obj = License.objects.filter(code=obj.license).first()
