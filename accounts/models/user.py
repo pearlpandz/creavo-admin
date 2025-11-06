@@ -23,6 +23,13 @@ class User(models.Model):
     last_login = models.DateTimeField(blank=True, null=True, default=None)
     business_category = models.ManyToManyField(SubCategory, related_name='business_category', blank=True)
     language = models.ManyToManyField(SubCategory, related_name='languages', blank=True)
+    free_subscription_days = models.PositiveIntegerField(default=0,help_text="Number of additional free subscription days for this user")
+    coupon_code = models.CharField(
+            max_length=50,
+            blank=True,
+            null=True,
+            help_text="Applied coupon code (if any)"
+        )
 
     def save(self, *args, **kwargs):
         if self.password and not self.password.startswith('pbkdf2_'):
