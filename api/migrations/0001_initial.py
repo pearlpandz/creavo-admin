@@ -62,7 +62,6 @@ class Migration(migrations.Migration):
                 ('media_type', models.CharField(choices=[('image', 'Image (png, jpg, webp, gif)'), ('video', 'Video')], default='image', max_length=50)),
                 ('title', models.CharField(max_length=100, null=True)),
                 ('short_description', models.TextField(blank=True, default=None, null=True)),
-                ('rating', models.CharField(choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5')], default=5, max_length=10)),
                 ('categories', models.ManyToManyField(blank=True, related_name='media', to='api.category')),
                 ('subcategories', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='media', to='api.subcategory')),
             ],
