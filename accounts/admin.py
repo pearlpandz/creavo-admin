@@ -2,7 +2,8 @@ from django.contrib import messages
 from django.urls import path
 from django.contrib import admin
 from django.shortcuts import get_object_or_404, redirect
-
+from django.core.exceptions import ValidationError
+import re
 from api.models.category import Category
 from api.models.subcategory import SubCategory
 from .models import User, Subscription, License, Distributor, MasterDistributor, Order, OrderSubscription, CompanyDetails, Product, Political, Supporters, Party
@@ -12,6 +13,15 @@ class ProductInline(nested_admin.NestedTabularInline):
     model = Product
     extra = 0
 
+    def clean(self):
+        super().clean()
+        if any(self.errors):
+            return
+        total_forms = len([form for form in self.forms if not form.cleaned_data.get('DELETE', False)])
+        existing_count = Product.objects.filter(user=self.instance).count()
+        if total_forms + existing_count > 6:
+            raise ValidationError("A user can have a maximum of 6 products.")
+ 
 class CompanyDetailsInline(nested_admin.NestedStackedInline):
     model = CompanyDetails
     extra = 0
@@ -43,6 +53,20 @@ class UserAdminForm(forms.ModelForm):
         model = User
         fields = '__all__'
 
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+            raise ValidationError("Email already exists!")
+        return email
+
+    def clean_mobile_number(self):
+        mobile = self.cleaned_data.get('mobile_number')
+        if not re.fullmatch(r'^[6-9]\d{9}$', mobile):
+            raise ValidationError("Mobile number must be a valid 10-digit number.")
+        if User.objects.filter(mobile_number=mobile).exclude(pk=self.instance.pk).exists():
+            raise ValidationError("Mobile number already exists!")
+        return mobile
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -65,10 +89,43 @@ class UserAdminForm(forms.ModelForm):
 @admin.register(User)
 class UserAdmin(nested_admin.NestedModelAdmin):
     form = UserAdminForm 
-    list_display = ('first_name', 'last_name', 'email', 'mobile_number', 'date_joined')
+    list_display = ('first_name', 'last_name', 'email', 'mobile_number','subscription_plan', 'subscription_validity', 'free_subscription_days', 'coupon_code','date_joined')
     search_fields = ('email', 'mobile_number', 'first_name', 'last_name')
     list_filter = ['date_joined']
     inlines = [CompanyDetailsInline, ProductInline, PoliticalInline]
+    list_editable = ('free_subscription_days', 'coupon_code')
+    list_per_page = 25  # pagination
+    list_max_show_all = 200
+    def subscription_plan(self, obj):
+        if obj.license:
+            license_obj = License.objects.filter(code=obj.license).first()
+            if license_obj and license_obj.subscription:
+                return license_obj.subscription.name
+        return '-'
+    subscription_plan.short_description = 'Subscription Plan'
+
+    def subscription_validity(self, obj):
+        if obj.license:
+            license_obj = License.objects.filter(code=obj.license).first()
+            if license_obj and license_obj.subscription:
+                return f"{license_obj.subscription.duration_days} days"
+        return '-'
+    subscription_validity.short_description = 'Validity'
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        # Ensure the License is marked as purchased when updated in admin
+        if obj.license:
+            from accounts.models.license import License
+            try:
+                license_obj = License.objects.get(code=obj.license)
+                if license_obj.status != 'purchased':
+                    license_obj.status = 'purchased'
+                    license_obj.purchased_by = obj
+                    license_obj.save(update_fields=['status', 'purchased_by'])
+            except License.DoesNotExist:
+                pass
+
     
     
 @admin.register(Subscription)

@@ -4,6 +4,15 @@ from .models import User, CompanyDetails, Product, Political, Supporters, Party
 from django.conf import settings
 import requests
 import os
+from django.utils import timezone
+from accounts.models.user import User
+from django.contrib.auth.signals import user_logged_in
+
+
+@receiver(user_logged_in)
+def update_last_login(sender, user, request, **kwargs):
+    user.last_login = timezone.now()
+    user.save(update_fields=['last_login'])
 
 def delete_media_from_service(image_url):
     if image_url:
