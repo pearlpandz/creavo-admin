@@ -11,16 +11,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='category',
-            name='is_active',
-            field=models.BooleanField(default=True),
-        ),
-        migrations.AddField(
-            model_name='subcategory',
-            name='is_active',
-            field=models.BooleanField(default=True),
-        ),
         migrations.AlterField(
             model_name='media',
             name='media_type',
