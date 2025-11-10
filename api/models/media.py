@@ -31,11 +31,12 @@ class Media(models.Model):
 
         if self.media:
             ext = os.path.splitext(self.media.name)[1].lower()
-            image_exts = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+            image_exts = ['.jpg', '.jpeg', '.png',  '.webp']
             video_exts = ['.mp4', '.mov', '.avi', '.mkv']
+            gif_exts = ['.gif']
 
             # Detect file type
-            if ext in image_exts:
+            if ext in image_exts + gif_exts:
                 self.media_type = 'image'
             elif ext in video_exts:
                 self.media_type = 'video'
@@ -49,6 +50,19 @@ class Media(models.Model):
         # Always set full image URL
         if not self.image and self.media:
             self.image = f"{base_url}{self.media.url}"
+
+
+        if ext in gif_exts:
+            try:
+                # Example: store GIFs in a separate folder on your media-service
+                gif_folder_url = "https://media-service.creavo.in/gif/"
+                gif_filename = os.path.basename(self.media.name)
+                self.image = f"{gif_folder_url}{gif_filename}"
+                self.thumbnail = self.image  # no thumbnail for GIF
+                print(f"✅ GIF uploaded and linked: {self.image}")
+            except Exception as e:
+                print("⚠️ GIF upload handling failed:", e)
+                self.thumbnail = self.image
 
         # Handle thumbnail
         if self.media_type == 'image':
