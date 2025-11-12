@@ -60,15 +60,15 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = "__all__"
 
-    def validate(self, data):
-        user = data.get("user") or getattr(self.instance, "user", None)
-        if user:
-            existing_count = Product.objects.filter(user=user).exclude(id=self.instance.id if self.instance else None).count()
-            if not self.instance and existing_count >= 6:
-                raise serializers.ValidationError("Maximum 6 products allowed per user.")
-            if self.instance and existing_count >= 6:
-                raise serializers.ValidationError("User already has 6 products — cannot assign more.")
-        return data
+    # def validate(self, data):
+    #     user = data.get("user") or getattr(self.instance, "user", None)
+    #     if user:
+    #         existing_count = Product.objects.filter(user=user).exclude(id=self.instance.id if self.instance else None).count()
+    #         if not self.instance and existing_count >= 6:
+    #             raise serializers.ValidationError("Maximum 6 products allowed per user.")
+    #         if self.instance and existing_count >= 6:
+    #             raise serializers.ValidationError("User already has 6 products — cannot assign more.")
+    #     return data
 
 
 class CompanyDetailsSerializer(serializers.ModelSerializer):

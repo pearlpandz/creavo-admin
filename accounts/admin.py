@@ -13,14 +13,14 @@ class ProductInline(nested_admin.NestedTabularInline):
     model = Product
     extra = 0
 
-    def clean(self):
-        super().clean()
-        if any(self.errors):
-            return
-        total_forms = len([form for form in self.forms if not form.cleaned_data.get('DELETE', False)])
-        existing_count = Product.objects.filter(user=self.instance).count()
-        if total_forms + existing_count > 6:
-            raise ValidationError("A user can have a maximum of 6 products.")
+    # def clean(self):
+    #     super().clean()
+    #     if any(self.errors):
+    #         return
+    #     total_forms = len([form for form in self.forms if not form.cleaned_data.get('DELETE', False)])
+    #     existing_count = Product.objects.filter(user=self.instance).count()
+    #     if total_forms + existing_count > 6:
+    #         raise ValidationError("A user can have a maximum of 6 products.")
  
 class CompanyDetailsInline(nested_admin.NestedStackedInline):
     model = CompanyDetails
