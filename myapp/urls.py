@@ -1,23 +1,16 @@
 from django.contrib import admin
-from django.urls import path, include, re_path
-from django.conf.urls.static import static
-from django.conf import settings
-from accounts.views.authentication import get_csrf
-from frontend.views import index
-from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView # type: ignore
+from django.urls import path, include
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('creavo_public/', include('creavo_public.urls')),
-    path('api/', include('api.urls')),
-    path('accounts/', include('accounts.urls')),
-    path('frames/', include('frames.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + [
-    re_path(r'^(?!api/|accounts/|frames/).*$', index),  # Exclude paths starting with 'api/' from being routed to 'index'
-]
+    path('api/auth/', include('core.urls')),
+    path('api/access/', include('accessibility.urls')),
+    path('api/retailer/', include('retailer.urls')),
+    path('api/distributor/', include('distributor.urls')),
 
-urlpatterns += [
+    # OpenAPI / Swagger
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('get_csrf', get_csrf, name='redoc')
+    path('api/docs/swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/docs/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]

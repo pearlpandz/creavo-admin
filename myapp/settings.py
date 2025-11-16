@@ -62,13 +62,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api.apps.ApiConfig',
-    'accounts.apps.AccountsConfig',
-    'frames.apps.FramesConfig',
     'corsheaders',
     'drf_spectacular',
     'nested_admin',
-    'creavo_public'
+    'core',
+    'accessibility',
+    'retailer',
+    'distributor',
 ]
 
 MIDDLEWARE = [
@@ -214,3 +214,11 @@ SIMPLE_JWT = {
     'SIGNING_KEY': SECRET_KEY,                     # Signing key (default is Django's SECRET_KEY)
     'AUTH_HEADER_TYPES': ('Bearer',),              # Header type for tokens
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT') or 587)
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'true') == 'true'
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@example.com')
