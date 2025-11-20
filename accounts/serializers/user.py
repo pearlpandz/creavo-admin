@@ -9,6 +9,7 @@ from rest_framework import serializers
 from ..models.user import User
 import re
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
