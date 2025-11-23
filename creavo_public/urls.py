@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (ContactViewSet, NewsletterViewSet, MediaViewSet, PageSectionViewSet,
                     ProjectViewSet, ServiceViewSet, TemplateViewSet, TemplateCategoryViewSet,
                     TestimonialViewSet, SettingsViewSet)
-
+from .views import CMSPageAPI
 router = DefaultRouter()
 router.register(r'contact', ContactViewSet, basename='contact')
 router.register(r'newsletter', NewsletterViewSet, basename='newsletter')
@@ -26,4 +26,5 @@ urlpatterns = [
     path('pages/<str:pk>/', PageSectionViewSet.as_view({'get':'retrieve'}), name='pages-detail'),
     path('settings/', SettingsViewSet.as_view({'get':'list'}), name='settings-list'),
     path('settings/<str:pk>/', SettingsViewSet.as_view({'get':'retrieve','put':'update'}), name='settings-detail'),
+    path("cms/", CMSPageAPI.as_view(), name="cms_page_api"),
 ]

@@ -13,7 +13,9 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('frames/', include('frames.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + [
-    re_path(r'^(?!api/|accounts/|frames/).*$', index),  # Exclude paths starting with 'api/' from being routed to 'index'
+    # re_path(r'^(?!api/|accounts/|frames/).*$', index),  # Exclude paths starting with 'api/' from being routed to 'index'
+    re_path(r'^(?!api/|accounts/|frames/|creavo_public/).*$', index),
+
 ]
 
 urlpatterns += [
