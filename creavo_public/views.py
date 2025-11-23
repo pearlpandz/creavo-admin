@@ -11,7 +11,14 @@ from .serializers import (ContactInquirySerializer, NewsletterSubscriberSerializ
                           MediaLibrarySerializer, PageSectionSerializer, ProjectSerializer,
                           ServiceSerializer, ServiceFeatureSerializer, TemplateSerializer,
                           TemplateCategorySerializer, TestimonialSerializer, SiteSettingSerializer)
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .models import PageSection, Project, Service, Testimonial, Blog
+from .serializers import (
+    PageSectionSerializer, ProjectSerializer, ServiceSerializer,
+    TestimonialSerializer, BlogSerializer
+)
+from .cms_config import CMS_CONFIG
 # Contact endpoints
 class ContactViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
     queryset = ContactInquiry.objects.all()
@@ -223,3 +230,54 @@ class SettingsViewSet(viewsets.ViewSet):
             val_str = str(val)
         obj, created = SiteSetting.objects.update_or_create(setting_key=pk, defaults={'setting_value': val_str, 'setting_type': t})
         return Response({'message':'saved'})
+
+MODEL_SERIALIZER_MAP = {
+    "Project": ProjectSerializer,
+    "Service": ServiceSerializer,
+    "Testimonial": TestimonialSerializer,
+    # "Blog": BlogSerializer,
+}
+
+
+class CMSPageAPI(APIView):
+
+    def get(self, request):
+        print("CMS API HIT")   
+        page = request.GET.get("page")
+        if not page:
+            return Response({"error": "Missing ?page="}, status=400)
+
+        if page not in CMS_CONFIG:
+            return Response({"error": "Invalid page"}, status=404)
+
+        config = CMS_CONFIG[page]
+        response = {"page": page, "sections": {}}
+
+        # ---------------------------
+        # SINGLE SECTIONS
+        # ---------------------------
+        for key, section_name in config["single"].items():
+            section = PageSection.objects.filter(
+                page_name=page, section_name=section_name, is_active=True
+            ).first()
+
+            response["sections"][key] = (
+                PageSectionSerializer(section).data if section else {}
+            )
+
+        # ---------------------------
+        # MULTIPLE SECTIONS (Dynamic)
+        # ---------------------------
+        for key, model_class in config["multi"].items():
+
+            model_name = model_class.__name__
+            serializer_class = MODEL_SERIALIZER_MAP.get(model_name)
+
+            if not serializer_class:
+                response["sections"][key] = []
+                continue
+
+            qs = model_class.objects.filter(is_active=True).order_by("display_order" if hasattr(model_class, "display_order") else "id")
+            response["sections"][key] = serializer_class(qs, many=True).data
+
+        return Response(response)

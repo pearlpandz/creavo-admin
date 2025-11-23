@@ -120,3 +120,6 @@ class Blog(models.Model):
     is_featured = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     views = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        db_table = "creavo_public_blog"
