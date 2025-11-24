@@ -11,7 +11,7 @@ class VerifyCreavoOriginMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
         cfg = getattr(settings, 'CREAVO_PUBLIC', {})
-        self.allowed_hosts = cfg.get('ALLOWED_HOSTS_ORIGINS', ['creavo.in', '.creavo.in'])
+        self.allowed_hosts = cfg.get('ALLOWED_HOSTS_ORIGINS', [])
         self.dev_ports = set(cfg.get('DEV_LOCALHOST_PORTS', []))
 
     def _is_allowed_origin(self, origin):
