@@ -41,3 +41,15 @@ class GetMediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Media
         exclude = ['categories', 'subcategories']
+
+
+class BulkMediaUploadSerializer(serializers.Serializer):
+    media = serializers.ListField(
+        child=serializers.FileField(),
+        required=True
+    )
+
+
+    def create(self, validated_data):
+        return validated_data
+
