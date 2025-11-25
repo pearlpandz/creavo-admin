@@ -14,6 +14,9 @@ from api.models.category import Category
 from api.models.subcategory import SubCategory
 from drf_spectacular.utils import extend_schema, OpenApiParameter # type: ignore
 from api.serializers.media import GetMediaSerializer
+from api.models.media import Media
+from api.serializers.media import BulkMediaUploadSerializer
+from rest_framework.parsers import MultiPartParser, FormParser
 
 @extend_schema(tags=['Cateogry'])
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -141,37 +144,80 @@ class CategoryViewSet(viewsets.ModelViewSet):
         }
         return Response(data)
     
-@extend_schema(tags=['Subcateogry'])
+# @extend_schema(tags=['Subcateogry'])
+# class SubCategoryViewSet(viewsets.ModelViewSet):
+#     # queryset = Category.objects.all()
+#     queryset =  SubCategory.objects.filter(is_active=True)
+#     serializer_class = SubCategorySerializer
+#     permission_classes = [IsAuthenticated]
+    
+#     @extend_schema(
+#         parameters=[
+#             OpenApiParameter(name='limit', description='Number of items to return', required=False, type=int, default=15),
+#             OpenApiParameter(name='skip', description='Number of items to skip', required=False, type=int, default=0),
+#         ]
+#     )
+#     @action(detail=False, methods=['get'], url_path='list')
+#     def category_paginate(self, request):
+#         """
+#         Returns list of category, with pagination.
+#         Query params:
+#             limit: int
+#             skip: int
+#         """
+#         limit = int(request.GET.get('limit', 15))
+#         skip = int(request.GET.get('skip', 0))
+#         queryset = Category.objects.all()
+#         total = queryset.count()
+#         categories = queryset[skip:skip+limit]
+#         data = {
+#             'categories': SubCategorySerializer(categories, many=True, context={'request': request}).data,
+#             'total': total,
+#             'limit': limit,
+#             'skip': skip
+#         }
+#         return Response(data)
+from drf_spectacular.utils import extend_schema, OpenApiTypes, OpenApiParameter, OpenApiExample, OpenApiRequest
+
 class SubCategoryViewSet(viewsets.ModelViewSet):
-    # queryset = Category.objects.all()
-    queryset =  SubCategory.objects.filter(is_active=True)
+    queryset = SubCategory.objects.all()
     serializer_class = SubCategorySerializer
-    permission_classes = [IsAuthenticated]
-    
+    parser_classes = [MultiPartParser, FormParser]
+
     @extend_schema(
-        parameters=[
-            OpenApiParameter(name='limit', description='Number of items to return', required=False, type=int, default=15),
-            OpenApiParameter(name='skip', description='Number of items to skip', required=False, type=int, default=0),
-        ]
+        request={
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'media': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'string',
+                            'format': 'binary'
+                        }
+                    }
+                }
+            }
+        },
+        responses=GetMediaSerializer(many=True)
     )
-    @action(detail=False, methods=['get'], url_path='list')
-    def category_paginate(self, request):
-        """
-        Returns list of category, with pagination.
-        Query params:
-            limit: int
-            skip: int
-        """
-        limit = int(request.GET.get('limit', 15))
-        skip = int(request.GET.get('skip', 0))
-        queryset = Category.objects.all()
-        total = queryset.count()
-        categories = queryset[skip:skip+limit]
-        data = {
-            'categories': SubCategorySerializer(categories, many=True, context={'request': request}).data,
-            'total': total,
-            'limit': limit,
-            'skip': skip
-        }
-        return Response(data)
-    
+    @action(detail=True, methods=['post'], url_path='bulk-upload-media')
+    def bulk_upload_media(self, request, pk=None):
+        subcategory = self.get_object()
+        serializer = BulkMediaUploadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        files = serializer.validated_data["media"]
+        items = []
+
+        for file in files:
+            m = Media.objects.create(subcategories=subcategory, media=file)
+            items.append(m)
+
+        return Response({
+            "message": "Uploaded",
+            "count": len(items),
+            "items": GetMediaSerializer(items, many=True).data
+        })
+
+
