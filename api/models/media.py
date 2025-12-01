@@ -55,7 +55,7 @@ class Media(models.Model):
         if ext in gif_exts:
             try:
                 # Example: store GIFs in a separate folder on your media-service
-                gif_folder_url = "https://media-service.creavo.in/gif/"
+                gif_folder_url = f"{settings.MEDIA_SERVER_URL}/gif/"
                 gif_filename = os.path.basename(self.media.name)
                 self.image = f"{gif_folder_url}{gif_filename}"
                 self.thumbnail = self.image  # no thumbnail for GIF
@@ -68,7 +68,7 @@ class Media(models.Model):
         if self.media_type == 'image':
             # Optionally upload to your image processing microservice
             try:
-                upload_url = "https://media-service.creavo.in/upload/media"
+                upload_url = f"{settings.MEDIA_SERVER_URL}/upload/media"
                 with open(self.media.path, "rb") as f:
                     files = {"file": (self.media.name, f)}
                     resp = requests.post(upload_url, files=files, timeout=10)

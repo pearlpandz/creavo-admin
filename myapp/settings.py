@@ -178,7 +178,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-MEDIA_SERVER_URL = os.getenv('MEDIA_SERVER_URL', 'http://localhost:4001/upload')
+MEDIA_SERVER_URL = os.getenv('MEDIA_SERVER_URL', 'http://localhost:4001')
 FRAME_SERVER_URL = os.getenv('FRAME_SERVER_URL', 'http://localhost:4000')
 
 CSRF_COOKIE_HTTPONLY = False  # Make cookie readable from JS
