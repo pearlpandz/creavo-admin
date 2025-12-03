@@ -111,11 +111,11 @@ class MediaAdminConfig(admin.ModelAdmin):
     def image_tag(self, obj):
         if obj.media:  # <-- changed from obj.thumbnail
             ext = obj.media.name.split('.')[-1].lower()
-            if ext in ['jpg', 'jpeg', 'png', 'gif']:
+            if ext in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
                 # For images and GIFs
                 return format_html(
                     '<img src="{}" width="60" height="60" style="object-fit:cover;border-radius:4px;" />',
-                    obj.media.url
+                    obj.thumbnail
                 )
             elif ext in ['mp4', 'mov']:
                 # For videos
