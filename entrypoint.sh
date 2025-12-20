@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-echo "Making migrations for all apps..."
-python manage.py makemigrations --noinput
-
 echo "Applying database migrations..."
 python manage.py migrate --noinput
 
@@ -18,15 +15,5 @@ END
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
-echo "Making & Applying migrations for apps..."
-python manage.py makemigrations api
-python manage.py migrate api
-
-python manage.py makemigrations accounts
-python manage.py migrate accounts
-
-python manage.py makemigrations frames
-python manage.py migrate frames
-
 echo "Starting Gunicorn..."
-exec gunicorn myapp.wsgi:application --bind 0.0.0.0:8000
+exec gunicorn myapp.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120
