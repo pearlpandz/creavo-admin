@@ -54,3 +54,5 @@ How to start the local server
 Clear old migrations for new setup
 find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
 find . -path "*/migrations/*.pyc" -delete
+
+--update
