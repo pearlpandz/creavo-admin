@@ -5,18 +5,18 @@ from django.utils.html import format_html
 @admin.register(FrameType)
 class FrameTypeAdmin(admin.ModelAdmin):
     # Use a method for M2M field instead of the raw field
-    list_display = ['image_tag', 'name', 'order', 'subcategories_list', 'media', 'description']
+    list_display = ['image_tag', 'name', 'description', 'order', 'subcategories_list']
     search_fields = ['name', 'description']
     list_filter = ['name']
     list_per_page = 15
     ordering = ['order']
-    exclude = ['image']  # optional: if you want to hide the URL field in the form
+    exclude = ['image', 'media']  # optional: if you want to hide the URL field in the form
 
     def image_tag(self, obj):
-        if obj.media:
+        if obj.image:
             return format_html(
                 '<img src="{}" width="60" height="60" style="object-fit:cover;border-radius:4px;" />',
-                obj.media.url  # Use FileField URL
+                obj.image  # Use FileField URL
             )
         return "-"
     image_tag.short_description = 'Image'
