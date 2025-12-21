@@ -211,7 +211,10 @@ class SubCategoryViewSet(viewsets.ModelViewSet):
         items = []
 
         for file in files:
-            m = Media.objects.create(subcategories=subcategory, media=file)
+            m = Media.objects.create(media=file)
+            m.subcategories.add(subcategory)
+            if hasattr(subcategory, 'category') and subcategory.category:
+                m.categories.add(subcategory.category)
             items.append(m)
 
         return Response({
