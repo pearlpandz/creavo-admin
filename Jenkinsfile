@@ -22,6 +22,7 @@ pipeline {
     environment {
         PROJECT_NAME = "creavo-admin"
         PYTHON       = "/usr/bin/python3"
+        BUILD_TIMESTAMP = "${new Date().format('yyyyMMddHHmmss')}"
     }
 
     stages {
@@ -37,7 +38,6 @@ pipeline {
 
                     env.VENV_PATH = "${env.RELEASE_DIR}/venv"
                     env.DJANGO_SETTINGS_MODULE = "myapp.settings"
-
                     env.ENV_FILE = "/etc/creavo/${env.DEPLOY_ENV}/django-admin.env"
 
                     echo """
