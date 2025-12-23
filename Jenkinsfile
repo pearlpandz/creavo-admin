@@ -133,21 +133,21 @@ pipeline {
                     string(credentialsId: 'django_admin_email', variable: 'ADMIN_EMAIL')
                 ]) {
                     sh """
-                    cd ${RELEASE_DIR}
-                    ${VENV_PATH}/bin/python manage.py shell << EOF
-                    from django.contrib.auth import get_user_model
-                    User = get_user_model()
+cd ${RELEASE_DIR}
+${VENV_PATH}/bin/python manage.py shell << EOF
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
-                    if not User.objects.filter(username="${ADMIN_USER}").exists():
-                        User.objects.create_superuser(
-                            "${ADMIN_USER}",
-                            "${ADMIN_EMAIL}",
-                            "${ADMIN_PASS}"
-                        )
-                        print("✅ Superuser created")
-                    else:
-                        print("ℹ️ Superuser already exists")
-                    EOF
+if not User.objects.filter(username="${ADMIN_USER}").exists():
+    User.objects.create_superuser(
+        "${ADMIN_USER}",
+        "${ADMIN_EMAIL}",
+        "${ADMIN_PASS}"
+    )
+    print("✅ Superuser created")
+else:
+    print("ℹ️ Superuser already exists")
+EOF
                     """
                 }
             }
