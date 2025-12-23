@@ -14,7 +14,7 @@ pipeline {
         )
         string(
             name: 'BRANCH',
-            defaultValue: 'master',
+            defaultValue: 'dev',
             description: 'Select branch to build'
         )
     }
@@ -55,7 +55,7 @@ pipeline {
 
         stage("Checkout") {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: 'refs/heads/${params.BRANCH}']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/creavo/creavo-admin.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: "refs/heads/${params.BRANCH}"]]])
             }
         }
 
