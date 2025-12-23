@@ -44,11 +44,25 @@ pipeline {
                     ✅ Environment resolved
                     Branch     : ${params.BRANCH}
                     Env        : ${env.DEPLOY_ENV}
-                    Deploy Dir : ${env.DEPLOY_BASE}
                     Release    : ${env.RELEASE_DIR}
                     Env File   : ${env.ENV_FILE}
                     Service    : ${env.GUNICORN_SERVICE}
                     """
+                }
+            }
+        }
+
+        stage("Load Environment Variables") {
+            steps {
+                script {
+                    def props = readProperties file: env.ENV_FILE
+                    props.each { key, value ->
+                        env[key] = value
+                    }
+
+                    echo "✔ ENV variables loaded into Jenkins"
+                    echo "PQ_HOST=${env.PQ_HOST}"
+                    echo "PQ_PORT=${env.PQ_PORT}"
                 }
             }
         }
@@ -69,20 +83,6 @@ pipeline {
             }
         }
 
-        stage("Load Environment Variables") {
-            steps {
-                sh """
-                set -a
-                source ${ENV_FILE}
-                set +a
-
-                echo "✔ ENV loaded"
-                echo "PQ_HOST=$PQ_HOST"
-                echo "PQ_PORT=$PQ_PORT"
-                """
-            }
-        }
-
         stage("Virtualenv & Dependencies") {
             steps {
                 sh """
@@ -96,7 +96,7 @@ pipeline {
         stage("Wait for Database") {
             steps {
                 sh """
-                until pg_isready -h $PQ_HOST -p $PQ_PORT; do
+                until pg_isready -h ${env.PQ_HOST} -p ${env.PQ_PORT}; do
                   echo "⏳ Waiting for PostgreSQL..."
                   sleep 2
                 done
