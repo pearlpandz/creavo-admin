@@ -122,10 +122,10 @@ pipeline {
 
     post {
         success {
-            echo "✅ React app deployed successfully to ${DEPLOY_ENV}"
+            echo "✅ React app deployed successfully to ${ENV}"
         }
         failure {
-            echo "❌ React deployment failed on ${DEPLOY_ENV}"
+            echo "❌ React deployment failed on ${ENV}"
         }
     }
 }
