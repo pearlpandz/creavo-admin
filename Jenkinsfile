@@ -55,7 +55,8 @@ pipeline {
 
         stage("Checkout") {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: "refs/heads/${params.BRANCH}"]]])
+                checkout scm
+                echo "✔️ Source code checked out"
             }
         }
 
