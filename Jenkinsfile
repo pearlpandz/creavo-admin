@@ -170,10 +170,13 @@ pipeline {
             }
         }
 
-        stage("Restart Service") {
+        stage("Start or Restart Service") {
             steps {
                 sh """
-                sudo systemctl restart ${GUNICORN_SERVICE}
+                sudo systemctl daemon-reload
+                sudo systemctl is-active --quiet ${GUNICORN_SERVICE} \
+                && sudo systemctl restart ${GUNICORN_SERVICE} \
+                || sudo systemctl start ${GUNICORN_SERVICE}
                 """
             }
         }
