@@ -134,8 +134,9 @@ pipeline {
                 ]) {
                     sh """
 cd ${RELEASE_DIR}
-${VENV_PATH}/bin/python manage.py shell << EOF
+${VENV_PATH}/bin/python manage.py shell << 'EOF'
 from django.contrib.auth import get_user_model
+
 User = get_user_model()
 
 if not User.objects.filter(username="${ADMIN_USER}").exists():
@@ -148,7 +149,7 @@ if not User.objects.filter(username="${ADMIN_USER}").exists():
 else:
     print("ℹ️ Superuser already exists")
 EOF
-                    """
+"""
                 }
             }
         }
