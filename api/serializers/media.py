@@ -8,7 +8,7 @@ class MediaSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(), many=True, required=False
     )
     subcategories = serializers.PrimaryKeyRelatedField(
-         queryset=SubCategory.objects.all(), required=False, allow_null=True
+            queryset=SubCategory.objects.all(), many=True, required=False
     )
 
     class Meta:
@@ -35,6 +35,28 @@ class MediaSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(f"File too large. Maximum allowed size for {ext.upper()} is {max_size // (1024*1024)} MB.")
 
         return value
+
+    def create(self, validated_data):
+        categories = validated_data.pop('categories', [])
+        subcategories = validated_data.pop('subcategories', [])
+        instance = Media.objects.create(**validated_data)
+        if categories:
+            instance.categories.set(categories)
+        if subcategories:
+            instance.subcategories.set(subcategories)
+        return instance
+
+    def update(self, instance, validated_data):
+        categories = validated_data.pop('categories', None)
+        subcategories = validated_data.pop('subcategories', None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        if categories is not None:
+            instance.categories.set(categories)
+        if subcategories is not None:
+            instance.subcategories.set(subcategories)
+        return instance
 
 # This serializer used only for get list of media under category or subcategory api
 class GetMediaSerializer(serializers.ModelSerializer):

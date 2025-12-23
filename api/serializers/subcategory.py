@@ -23,7 +23,10 @@ class SubCategorySerializer(serializers.ModelSerializer):
         media_data = validated_data.pop('media', [])
         subcategory = SubCategory.objects.create(**validated_data)
         for media_item in media_data:
-            Media.objects.create(subcategories=subcategory, **media_item)
+            m = Media.objects.create(**media_item)
+            m.subcategories.add(subcategory)
+            if hasattr(subcategory, 'category') and subcategory.category:
+                m.categories.add(subcategory.category)
         return subcategory
 
     def update(self, instance, validated_data):
@@ -32,5 +35,8 @@ class SubCategorySerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         for media_item in media_data:
-            Media.objects.create(subcategories=instance, **media_item)
+            m = Media.objects.create(**media_item)
+            m.subcategories.add(instance)
+            if hasattr(instance, 'category') and instance.category:
+                m.categories.add(instance.category)
         return instance

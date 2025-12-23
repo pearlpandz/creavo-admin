@@ -19,6 +19,7 @@ import csv
 from django.contrib import messages
 from django import forms
 from django.template.response import TemplateResponse
+from django.contrib.admin.widgets import FilteredSelectMultiple
 
 
 
@@ -28,21 +29,13 @@ class SubCategoryInline(admin.StackedInline):
     model = SubCategory
     extra = 0
 
-class MediaInline(admin.StackedInline):
-    model = Media
+class MediaInline(admin.TabularInline):
+    # Use the auto-generated through model for the ManyToMany relation
+    model = Media.subcategories.through
     extra = 1
-    # filter_horizontal = ('categories', 'subcategories')
-    fields = ('title', 'media', 'image', 'short_description', 'rating', 'categories', 'subcategories', 'image_tag')
-    readonly_fields = ('image_tag',)
-
-    def image_tag(self, obj):
-        if obj.thumbnail:
-            return format_html(
-                '<img src="{}" width="60" height="60" style="object-fit:cover;border-radius:4px;" />',
-                obj.thumbnail
-            )
-        return "-"
-    image_tag.short_description = 'Image'
+    verbose_name = "Media"
+    verbose_name_plural = "Media"
+    raw_id_fields = ('media',)
 
 @admin.register(Category)
 class CategoryAdminConfig(admin.ModelAdmin):
@@ -96,10 +89,44 @@ class CategoryMediaInline(admin.TabularInline):
 
 @admin.register(Media)
 class MediaAdminConfig(admin.ModelAdmin):
-    list_display = ('image_tag', 'title', 'rating','categories_list', 'subcategory_name')
-    filter_horizontal = ('categories',)  # Nice UI for multi-select
-    exclude = ['image', 'thumbnail']  # hides the field from the form
+    list_display = ('image_tag', 'title', 'rating','categories_list', 'subcategories_list')
+    exclude = ['image', 'thumbnail', 'categories', 'subcategories']  # hide original multi-selects
+    form = None  # set below
     list_per_page = 15
+
+    def save_model(self, request, obj, form, change):
+        # Ensure combined category_subcategory selections are applied to M2M fields
+        super().save_model(request, obj, form, change)
+        try:
+            selected = form.cleaned_data.get('category_subcategory', [])
+        except Exception:
+            selected = []
+
+        cat_ids = set()
+        sub_ids = set()
+        for token in selected:
+            if token.startswith('c:'):
+                try:
+                    cid = int(token.split(':', 1)[1])
+                    cat_ids.add(cid)
+                except Exception:
+                    continue
+            elif token.startswith('sc:'):
+                try:
+                    sid = int(token.split(':', 1)[1])
+                    sub_ids.add(sid)
+                    try:
+                        sc = SubCategory.objects.get(id=sid)
+                        if sc.category_id:
+                            cat_ids.add(sc.category_id)
+                    except SubCategory.DoesNotExist:
+                        pass
+                except Exception:
+                    continue
+
+        if cat_ids or sub_ids:
+            obj.categories.set(list(cat_ids))
+            obj.subcategories.set(list(sub_ids))
 
     # def image_tag(self, obj):
     #     if obj.thumbnail:
@@ -132,9 +159,12 @@ class MediaAdminConfig(admin.ModelAdmin):
         return ", ".join([c.name for c in obj.categories.all()])
     categories_list.short_description = "Categories"
 
-    def subcategory_name(self, obj):
-        return obj.subcategories.name if obj.subcategories else "-"
-    subcategory_name.short_description = "SubCategory"
+    def subcategories_list(self, obj):
+        subs = obj.subcategories.all()
+        if not subs:
+            return "-"
+        return ", ".join([s.name for s in subs])
+    subcategories_list.short_description = "SubCategories"
 
     def delete_queryset(self, request, queryset):
         print("Call delete() on each object to trigger Node.js cleanup")
@@ -142,6 +172,99 @@ class MediaAdminConfig(admin.ModelAdmin):
             print(obj)
             obj.delete()
 
+
+# Custom ModelForm to present a single combined multi-select for Category|SubCategory
+class MediaAdminForm(forms.ModelForm):
+    category_subcategory = forms.MultipleChoiceField(
+        required=False,
+        widget=FilteredSelectMultiple("Category | SubCategory", is_stacked=False)
+    )
+
+    class Meta:
+        model = Media
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Build choices: for categories with subcategories, show "Category | Subcategory" per subcategory
+        choices = []
+        for cat in Category.objects.all().order_by('name'):
+            subs = list(cat.subcategories.all())
+            if subs:
+                for s in subs:
+                    choices.append((f"sc:{s.id}", f"{cat.name} | {s.name}"))
+            else:
+                choices.append((f"c:{cat.id}", f"{cat.name}"))
+
+        self.fields['category_subcategory'].choices = choices
+
+        # Set initial selections from instance
+        if self.instance and self.instance.pk:
+            initial = []
+            sub_ids = set(self.instance.subcategories.values_list('id', flat=True))
+            # Mark subcategory selections
+            for sid in sub_ids:
+                initial.append(f"sc:{sid}")
+
+            # For categories, only include category-level choices if none of its subcategories are selected
+            for c in self.instance.categories.all():
+                # if category has subcategories and any subcategory of this category is already selected, skip
+                cat_subs = set(c.subcategories.values_list('id', flat=True))
+                if cat_subs and cat_subs & sub_ids:
+                    continue
+                initial.append(f"c:{c.id}")
+
+            self.fields['category_subcategory'].initial = initial
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        selected = self.cleaned_data.get('category_subcategory', [])
+        cat_ids = set()
+        sub_ids = set()
+        for token in selected:
+            if token.startswith('c:'):
+                try:
+                    cid = int(token.split(':', 1)[1])
+                    cat_ids.add(cid)
+                except Exception:
+                    continue
+            elif token.startswith('sc:'):
+                try:
+                    sid = int(token.split(':', 1)[1])
+                    sub_ids.add(sid)
+                    # ensure parent category is also included
+                    try:
+                        sc = SubCategory.objects.get(id=sid)
+                        if sc.category_id:
+                            cat_ids.add(sc.category_id)
+                    except SubCategory.DoesNotExist:
+                        pass
+                except Exception:
+                    continue
+
+        if commit:
+            instance.save()
+            instance.categories.set(list(cat_ids))
+            instance.subcategories.set(list(sub_ids))
+            self.save_m2m()
+        else:
+            # store pending m2m for save_m2m later
+            self._pending_m2m = (list(cat_ids), list(sub_ids))
+
+        return instance
+
+    def save_m2m(self):
+        # handle pending m2m if present
+        if hasattr(self, '_pending_m2m'):
+            cat_ids, sub_ids = self._pending_m2m
+            self.instance.categories.set(cat_ids)
+            self.instance.subcategories.set(sub_ids)
+        else:
+            super().save_m2m()
+
+
+# attach form to admin
+MediaAdminConfig.form = MediaAdminForm
 
 class EventMediaInline(admin.StackedInline):
     model = EventMedia
