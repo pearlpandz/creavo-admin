@@ -104,7 +104,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         skip = int(request.GET.get('skip', 0))
         media_qs = category.media.all()
         if subcategory_id != 'all' and subcategory_id != None:
-            media_qs = category.media.filter(subcategories__id=int(subcategory_id))
+            media_qs = category.media.filter(subcategories__pk=int(subcategory_id))
         enabled_ratings = []
         if license_details is not None:
             subscription = license_details.get('subscription', None)

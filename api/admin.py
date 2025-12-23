@@ -160,10 +160,13 @@ class MediaAdminConfig(admin.ModelAdmin):
     categories_list.short_description = "Categories"
 
     def subcategories_list(self, obj):
-        subs = obj.subcategories.all()
-        if not subs:
-            return "-"
-        return ", ".join([s.name for s in subs])
+        try:
+            subs = obj.subcategories.all()
+            if not subs:
+                return "-"
+            return ", ".join([s.name for s in subs])
+        except Exception as e:
+            return f"Error: {e}"
     subcategories_list.short_description = "SubCategories"
 
     def delete_queryset(self, request, queryset):
