@@ -118,13 +118,17 @@ class CategoryViewSet(viewsets.ModelViewSet):
             elif subcategory_id == 'all':
                 ids = user.business_category.values_list("id", flat=True)
                 media_qs = media_qs.filter(subcategories__id__in=ids)
+            print("Business category filter applied", media_qs.query)
         elif "language" in category.name.lower():
             if subcategory_id and subcategory_id != 'all':
                 if str(subcategory_id).isdigit():
+                    print("Filtering for subcategory id:", subcategory_id)
+                    print("Before filter query:", media_qs.query)
                     media_qs = media_qs.filter(subcategories__id=int(subcategory_id))
             elif subcategory_id == 'all':
                 ids = user.language.values_list("id", flat=True)
                 media_qs = media_qs.filter(subcategories__id__in=ids)
+            print("Language category filter applied", media_qs.query)
         # For other categories, do not filter by subcategory at all (always return all media)
 
         if license_details is None:

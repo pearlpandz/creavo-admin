@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.core.exceptions import ValidationError
 from rest_framework import status
 from accounts.serializers.user import UserSerializer
+from django.utils import timezone
 
 def authenticate_user(request, user_model, user_type):
     email = request.data.get("email")
@@ -19,6 +20,11 @@ def authenticate_user(request, user_model, user_type):
 
     if not user or not check_password(password, user.password):
         raise AuthenticationFailed(f"Invalid credentials for {user_type}.")
+    
+    # UPDATE last_login only for User model
+    if user_type == "User":
+        user.last_login = timezone.now()
+        user.save(update_fields=["last_login"])
 
     refresh = RefreshToken.for_user(user)
 
