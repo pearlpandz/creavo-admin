@@ -52,8 +52,10 @@ class CategorySerializer(serializers.ModelSerializer):
             ).data
 
         # Handle Language
-        elif category_name == 'language':
+        elif category_name == 'languages quotes':
+            print("Fetching Language Subcategories")  # Debugging line
             languages = profile.get('language', [])
+            print("User Selected Languages:", languages)  # Debugging line
             allowed_ids = [item['id'] for item in languages]
             return SubCategorySerializer(
                 SubCategory.objects.filter(id__in=allowed_ids, category=category),

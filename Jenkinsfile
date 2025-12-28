@@ -174,10 +174,18 @@ EOF
         stage("Start or Restart Service") {
             steps {
                 sh """
+                whoami
+                id
+                set +e
                 sudo systemctl daemon-reload
-                sudo systemctl is-active --quiet ${GUNICORN_SERVICE} \
-                && sudo systemctl restart ${GUNICORN_SERVICE} \
-                || sudo systemctl start ${GUNICORN_SERVICE}
+
+                if sudo systemctl is-active --quiet ${GUNICORN_SERVICE}; then
+                    echo "🔄 Restarting ${GUNICORN_SERVICE}"
+                    sudo systemctl restart ${GUNICORN_SERVICE}
+                else
+                    echo "🚀 Starting ${GUNICORN_SERVICE}"
+                    sudo systemctl start ${GUNICORN_SERVICE}
+                fi
                 """
             }
         }
