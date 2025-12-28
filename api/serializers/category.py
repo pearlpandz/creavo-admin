@@ -52,7 +52,7 @@ class CategorySerializer(serializers.ModelSerializer):
             ).data
 
         # Handle Language
-        elif category_name == 'language':
+        elif category_name == 'languages quotes':
             languages = profile.get('language', [])
             allowed_ids = [item['id'] for item in languages]
             return SubCategorySerializer(
