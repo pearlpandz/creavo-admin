@@ -19,11 +19,8 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# env = environ.Env(DEBUG=(bool, False))
-# environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
-MEDIA_URL = '/uploads/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
+env = environ.Env(DEBUG=(bool, False))
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 STATIC_URL = '/static/'
 
@@ -53,8 +50,6 @@ CORS_ALLOW_CREDENTIALS = True
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-print("DEBUG ALLOWED_HOSTS:", ALLOWED_HOSTS)
 
 # Application definition
 
@@ -180,7 +175,8 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# MEDIA_ROOT = BASE_DIR / 'media' # for local development
+MEDIA_ROOT = "/tmp/creavo-admin-media"
 
 MEDIA_SERVER_URL = os.getenv('MEDIA_SERVER_URL', 'http://localhost:4001')
 FRAME_SERVER_URL = os.getenv('FRAME_SERVER_URL', 'http://localhost:4000')
