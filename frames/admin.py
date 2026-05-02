@@ -10,7 +10,7 @@ class FrameTypeAdmin(admin.ModelAdmin):
     list_filter = ['name']
     list_per_page = 15
     ordering = ['order']
-    exclude = ['image', 'media']  # optional: if you want to hide the URL field in the form
+    exclude = ['image']  # optional: if you want to hide the URL field in the form
 
     def image_tag(self, obj):
         if obj.image:
