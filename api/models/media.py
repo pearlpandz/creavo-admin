@@ -52,38 +52,6 @@ class Media(models.Model):
             self.image = f"{base_url}{self.media.url}"
 
 
-        if ext in gif_exts:
-            try:
-                # Example: store GIFs in a separate folder on your media-service
-                gif_folder_url = f"{settings.MEDIA_SERVER_URL}/gif/"
-                gif_filename = os.path.basename(self.media.name)
-                self.image = f"{gif_folder_url}{gif_filename}"
-                self.thumbnail = self.image  # no thumbnail for GIF
-                print(f"✅ GIF uploaded and linked: {self.image}")
-            except Exception as e:
-                print("⚠️ GIF upload handling failed:", e)
-                self.thumbnail = self.image
-
-        # Handle thumbnail
-        if self.media_type == 'image':
-            # Optionally upload to your image processing microservice
-            try:
-                upload_url = f"{settings.MEDIA_SERVER_URL}/upload/media"
-                with open(self.media.path, "rb") as f:
-                    files = {"file": (self.media.name, f)}
-                    resp = requests.post(upload_url, files=files, timeout=10)
-                    if resp.status_code == 200:
-                        data = resp.json()
-                        # Expecting something like: {"url": "...", "thumbnail": "..."}
-                        self.image = data.get("url", self.image)
-                        self.thumbnail = data.get("thumbnail", self.image)
-                    else:
-                        # Fallback to direct URL if upload service fails
-                        self.thumbnail = self.image
-            except Exception as e:
-                print("⚠️ Media service upload failed:", e)
-                self.thumbnail = self.image
-
         elif self.media_type == 'video':
             # Don't upload videos to media-service
             # Use the video file itself for .image, and set thumbnail placeholder
